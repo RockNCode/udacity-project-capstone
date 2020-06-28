@@ -10,7 +10,7 @@ The application is based on serverless rubric.
 
 Specially useful for babies with feeding problems or swallow issues, as they have to follow a more strict nutrition schedule.
 
-# TODO items
+# Tracker items.
 
 The application will store the planned schedule and by date table, will compare planned vs actual and give totals per day:
 
