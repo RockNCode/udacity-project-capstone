@@ -23,13 +23,11 @@ The profile table (unique)
 * `formula` (string) Planned total formule milk per day (ml)
 
 The tracker table
+* `userId` (string) - the userId
 * `date` (string) - the unique id for an item
-* `napStart` (string)(optional) -  time when baby started started
-* `napEnd` (string)(optional) - time of when baby woke up
-* `breastfeed` (string)(optional) -  time of when baby was breast fed
-* `formula` (string)(optional) - time when baby fed using formula
-* `peeDiaper` (string) (optional) - time when baby had a pee diaper change
-* `poopDiaper` (string) (optional) - time when baby had a pee diaper change
+* `type` (string) - The type of tracking item (nap,formula, breastmilk, diaper)
+* 'timeStart' - the time at which the event happend.
+* 'duration' - how long it lasted (only valuable for nap times).
 * `comments` (string) (optional) - any comments
 
 
