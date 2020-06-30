@@ -22,7 +22,7 @@ The profile table (unique)
 * `breastfeed`(string) Planned total breast milk per day (ml)
 * `formula` (string) Planned total formule milk per day (ml)
 
-The days table
+The tracker table
 * `date` (string) - the unique id for an item
 * `napStart` (string)(optional) -  time when baby started started
 * `napEnd` (string)(optional) - time of when baby woke up
