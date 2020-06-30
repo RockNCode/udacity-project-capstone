@@ -3,22 +3,25 @@
     "title": "todos",
     "type": "object",
     "properties": {
-      "name": {
+      "date": {
         "type": "string",
         "minLength": 1
       },
-      "dueDate": {
+      "type": {
         "type": "string"
       },
-      "attachmentUrl": {
+      "timeStart": {
         "type": "string"
       },
-      "done": {
-        "type": "boolean"
+      "duration": {
+        "type": "number"
+      },
+      "comments": {
+        "type": "string"
       }
     },
     "required": [
-      "name","dueDate"
+      "date","type","timeStart"
     ],
     "additionalProperties": false
 }

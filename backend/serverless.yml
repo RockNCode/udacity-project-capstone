@@ -1,5 +1,5 @@
 service:
-  name: serverless-todo-app
+  name: serverless-${self:provider.environment.PROJECT}-app
 
 plugins:
   - serverless-webpack
@@ -17,16 +17,17 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
-  tracing:
-    lambda: true
-    apiGateway: true
+  # TODO uncomment when full code is enabled.
+  # tracing:
+  #   lambda: true
+  #   apiGateway: true
 
   environment:
-    TODOS_TABLE: Todos2-${self:provider.stage}
-    IMAGES_S3_BUCKET: images-todos-${self:provider.stage}
-
+    TRACKER_TABLE: ${self:provider.environment.PROJECT}-${self:provider.stage}
+    IMAGES_S3_BUCKET: images-${self:provider.environment.PROJECT}-${self:provider.stage}
+    PROJECT: babytracker
 custom:
-  topicName: TodosTopic-${self:provider.stage}
+  topicName: ${self:provider.environment.PROJECT}-Topic-${self:provider.stage}
   # Local config
   serverless-offline:
     port: 3003
@@ -45,109 +46,105 @@ custom:
     api:
       info:
         version: v1.0.0
-        title: Todos API
-        description: Serverless application for ToDos tracking
+        title: Baby tracker API
+        description: Serverless application for Baby tracker tracking
     models:
-      - name: TodoRequestSchema
+      - name:  ${self:provider.environment.PROJECT}RequestSchema
         contentType: application/json
-        schema: ${file(models/todo-request.json)}
+        schema: ${file(models/tracking-request.json)}
 
 functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # TODO: Configure this function
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
-    events:
-      - http:
-          method: get
-          path: todos
-          cors: true
-          auth: Auth
-    iamRoleStatementsName: Todos-role-get-todo-${self:provider.stage}
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+  # GetTodos:
+  #   handler: src/lambda/http/getTodos.handler
+  #   events:
+  #     - http:
+  #         method: get
+  #         path: todos
+  #         cors: true
+  #         auth: Auth
+  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-todo-${self:provider.stage}
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #         - dynamodb:Query
+  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  CreateTrackingItem:
+    handler: src/lambda/http/createTracking.handler
     events:
       - http:
           method: post
-          path: todos
-          cors: true
-          authorizer : Auth
+          path: tracking
+          # cors: true
+          # authorizer : Auth
           reqValidatorName: RequestBodyValidator
           documentation:
-            summary: Create Todo
-            description: Create Todo
+            summary: Create Tracking Item
+            description: Create Tracking item
             requestModels:
-              'application/json': TodoRequestSchema
-    iamRoleStatementsName: Todos-role-create-todo-${self:provider.stage}
+              'application/json': ${self:provider.environment.PROJECT}RequestSchema
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-create-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  # TODO: Configure this function
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
-    events:
-      - http:
-          method: patch
-          path: todos/{todoId}
-          cors: true
-          authorizer : Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Update Todo
-            description: Update Todo
-            requestModels:
-              'application/json': TodoRequestSchema
-    iamRoleStatementsName: Todos-role-update-todo-${self:provider.stage}
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+  # UpdateTodo:
+  #   handler: src/lambda/http/updateTodo.handler
+  #   events:
+  #     - http:
+  #         method: patch
+  #         path: todos/{todoId}
+  #         cors: true
+  #         authorizer : Auth
+  #         reqValidatorName: RequestBodyValidator
+  #         documentation:
+  #           summary: Update Todo
+  #           description: Update Todo
+  #           requestModels:
+  #             'application/json': ${self:provider.environment.PROJECT}RequestSchema
+  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-todo-${self:provider.stage}
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #         - dynamodb:UpdateItem
+  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  # TODO: Configure this function
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
-    events:
-      - http:
-          method: delete
-          path: todos/{todoId}
-          cors: true
-          authorizer : Auth
-    iamRoleStatementsName: Todos-role-delete-todo-${self:provider.stage}
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:DeleteItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+  # DeleteTodo:
+  #   handler: src/lambda/http/deleteTodo.handler
+  #   events:
+  #     - http:
+  #         method: delete
+  #         path: todos/{todoId}
+  #         cors: true
+  #         authorizer : Auth
+  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-delete-todo-${self:provider.stage}
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #         - dynamodb:DeleteItem
+  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  # TODO: Configure this function
-  GenerateUploadUrl:
-    handler: src/lambda/http/generateUploadUrl.handler
-    events:
-      - http:
-          method: post
-          path: todos/{todoId}/attachment
-          cors: true
-          authorizer : Auth
-    iamRoleStatementsName: Todos-role-upload-s3-${self:provider.stage}
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-        - s3:PutObject
-        - s3:GetObject
-        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+  # GenerateUploadUrl:
+  #   handler: src/lambda/http/generateUploadUrl.handler
+  #   events:
+  #     - http:
+  #         method: post
+  #         path: todos/{todoId}/attachment
+  #         cors: true
+  #         authorizer : Auth
+  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-upload-s3-${self:provider.stage}
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #       - s3:PutObject
+  #       - s3:GetObject
+  #       Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
         
 resources:
   Resources:
@@ -169,33 +166,23 @@ resources:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
         ValidateRequestParameters: false
-    TodosDynamoDBTable:
+    TrackerDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          - AttributeName: todoId
-            AttributeType: S
-          # - AttributeName: createdAt
-          #   AttributeType: S
           - AttributeName: userId
             AttributeType: S
-          # - AttributeName: name
-          #   AttributeType: S
-          # - AttributeName: dueDate
-          #   AttributeType: S
-          # - AttributeName: done
-          #   AttributeType: S
-          # - AttributeName: attachmentUrl
-          #   AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: date
             KeyType: RANGE
-          # - AttributeName: createdAt
-          #   KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.TRACKER_TABLE}
+
     ImagesBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -214,6 +201,7 @@ resources:
                 - DELETE
                 - HEAD
               MaxAge: 3000
+
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
