@@ -94,26 +94,26 @@ functions:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  # UpdateTodo:
-  #   handler: src/lambda/http/updateTodo.handler
-  #   events:
-  #     - http:
-  #         method: patch
-  #         path: todos/{todoId}
-  #         cors: true
-  #         authorizer : Auth
-  #         reqValidatorName: RequestBodyValidator
-  #         documentation:
-  #           summary: Update Todo
-  #           description: Update Todo
-  #           requestModels:
-  #             'application/json': ${self:provider.environment.PROJECT}RequestSchema
-  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-todo-${self:provider.stage}
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #         - dynamodb:UpdateItem
-  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
+  UpdateTracking:
+    handler: src/lambda/http/updateTracking.handler
+    events:
+      - http:
+          method: patch
+          path: tracking/{trackingId}
+          # cors: true
+          # authorizer : Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update tracking
+            description: Update Tracking
+            requestModels:
+              'application/json': ${self:provider.environment.PROJECT}RequestSchema
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-tracking-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
   DeleteTodo:
     handler: src/lambda/http/deleteTracking.handler

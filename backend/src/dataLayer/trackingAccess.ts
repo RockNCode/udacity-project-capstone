@@ -1,7 +1,7 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import * as AWSXRay from 'aws-xray-sdk'
 import { TrackingItem } from '../models/TrackingItem'
-//import { TodoUpdate } from '../models/TodoUpdate'
+import { TrackingUpdate } from '../models/TrackingUpdate'
 import * as AWS  from 'aws-sdk'
 
 const XAWS = AWSXRay.captureAWS(AWS)
@@ -50,28 +50,28 @@ export class TrackingAccess {
         return await this.docClient.delete(params).promise()
     }
 
-    // async updateTodoById(item : TodoUpdate,
-    //                     userId : string,
-    //                     todoId : string,
-    //                  ): Promise<TodoUpdate> {
-    //     var params = {
-    //         TableName:this.todosTable,
-    //         Key:{
-    //             "userId": userId,
-    //             "todoId": todoId
-    //         },
-    //         ExpressionAttributeNames: { "#myname": "name" },
-    //         UpdateExpression: "set #myname = :taskname, dueDate=:dueDate, done=:done",
-    //         ExpressionAttributeValues:{
-    //             ":taskname":item.name,
-    //             ":dueDate":item.dueDate,
-    //             ":done": item.done
-    //         },
-    //         ReturnValues:"UPDATED_NEW"
-    //       };
-    //     await this.docClient.update(params).promise()
-    //     return item
-    // }
+    async updateTrackingById(item : TrackingUpdate,
+                        userId : string,
+                        trackingId : string,
+                     ): Promise<TrackingUpdate> {
+        var params = {
+            TableName:this.trackingTable,
+            Key:{
+                "userId": userId,
+                "trackingId": trackingId
+            },
+            //ExpressionAttributeNames: { "#myname": "name" },
+            UpdateExpression: "set timeStart = :timeStart, duration=:duration, comments=:comments",
+            ExpressionAttributeValues:{
+                ":timeStart":item.timeStart,
+                ":duration":item.duration,
+                ":comment": item.comments
+            },
+            ReturnValues:"UPDATED_NEW"
+          };
+        await this.docClient.update(params).promise()
+        return item
+    }
 
     async generatePresignedUrl(todoId : string) {
         const s3 = new XAWS.S3({signatureVersion: 'v4'})
