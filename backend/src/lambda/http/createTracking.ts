@@ -1,17 +1,16 @@
 import 'source-map-support/register'
-//import * as uuid from 'uuid'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
-// import { CreateTodoRequest } from '../../requests/CreateTrackingRequest'
-// import { TodoItem } from '../../models/TodoItem';
-// import { createTodo } from '../../businessLogic/Todos'
+import { CreateTrackingRequest } from '../../requests/CreateTrackingRequest'
+import { TrackingItem } from '../../models/TrackingItem';
+import { createTracking } from '../../businessLogic/Tracking'
 
-// const utils = require("../utils.ts");
+const utils = require("../utils.ts");
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // const newTodo: CreateTodoRequest = JSON.parse(event.body)
-  // console.log(newTodo)
-  // const newItem = await createTodoApp(event);
+  const newTracking: CreateTrackingRequest = JSON.parse(event.body)
+  console.log(newTracking)
+  const newItem = await createTrackingApp(event);
   console.log(JSON.stringify(event))
   return {
     statusCode: 201,
@@ -20,14 +19,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      item : "test",
+      item : newItem,
     })
   }
 }
 
-// async function createTodoApp(event: any) {
-//   const newTodo: TodoItem = JSON.parse(event.body)
-//   const userId = utils.getUserId(event);
-//   console.log(event)
-//   return await createTodo(newTodo,userId);
-// }
+async function createTrackingApp(event: any) {
+  const newTodo: TrackingItem = JSON.parse(event.body)
+  const userId = utils.getUserId(event);
+  console.log(event)
+  return await createTracking(newTodo,userId);
+}
