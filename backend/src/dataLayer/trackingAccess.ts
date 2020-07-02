@@ -38,17 +38,17 @@ export class TrackingAccess {
     return item
     }
 
-    // async deleteTodoById(userId : string, todoId : string): Promise<any> {
-    //     var params = {
-    //         TableName:this.todosTable,
-    //           Key : {
-    //               "userId": userId,
-    //               "todoId": todoId
-    //           }
-    //         };
+    async deleteTrackingById(userId : string, trackingId : string): Promise<any> {
+        var params = {
+            TableName:this.trackingTable,
+              Key : {
+                  "userId": userId,
+                  "todoId": trackingId
+              }
+            };
 
-    //     return await this.docClient.delete(params).promise()
-    // }
+        return await this.docClient.delete(params).promise()
+    }
 
     // async updateTodoById(item : TodoUpdate,
     //                     userId : string,

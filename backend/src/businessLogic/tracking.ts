@@ -33,9 +33,9 @@ export async function createTracking(
     return await trackingAccess.createTrackingDB(item)
   }
 
-//   export async function deleteTodoById(userId : string, todoId : string){
-//       return await todosAccess.deleteTodoById(userId, todoId);
-//   }
+  export async function deleteTrackingById(userId : string, trackingId : string){
+      return await trackingAccess.deleteTrackingById(userId, trackingId);
+  }
 
 //   export async function updateTodoById(updateTodoRequest : UpdateTodoRequest,
 //     userId: string, todoId : string) {
