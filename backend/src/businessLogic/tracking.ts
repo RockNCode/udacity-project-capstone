@@ -46,6 +46,6 @@ export async function createTracking(
 
   }
 
-//   export async function generatePresignedUploadToS3(todoId: string)  {
-//       return await todosAccess.generatePresignedUrl(todoId);
-//   }
+  export async function generatePresignedUploadToS3(todoId: string)  {
+      return await trackingAccess.generatePresignedUrl(todoId);
+  }

@@ -130,21 +130,21 @@ functions:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
-  # GenerateUploadUrl:
-  #   handler: src/lambda/http/generateUploadUrl.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos/{todoId}/attachment
-  #         cors: true
-  #         authorizer : Auth
-  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-upload-s3-${self:provider.stage}
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #       - s3:PutObject
-  #       - s3:GetObject
-  #       Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: tracking/{trackingId}/attachment
+          # cors: true
+          # authorizer : Auth
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-upload-s3-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - s3:PutObject
+        - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
         
 resources:
   Resources:
