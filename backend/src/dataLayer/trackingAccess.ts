@@ -13,20 +13,20 @@ export class TrackingAccess {
     private readonly trackingTable = process.env.TRACKER_TABLE) {
   }
 
-//   async getTodosByUserId(userId : string ): Promise<TodoItem[]> {
-//     console.log('Getting all Todos for user')
+  async getTrackingByUserId(userId : string ): Promise<TrackingItem[]> {
+    console.log('Getting all Todos for user')
 
-//     const result = await this.docClient.query({
-//         TableName : this.todosTable,
-//         KeyConditionExpression: 'userId = :userId',
-//         ExpressionAttributeValues: {
-//             ':userId': userId
-//         }
-//     }).promise()
+    const result = await this.docClient.query({
+        TableName : this.trackingTable,
+        KeyConditionExpression: 'userId = :userId',
+        ExpressionAttributeValues: {
+            ':userId': userId
+        }
+    }).promise()
 
-//     const items = result.Items
-//     return items as TodoItem[]
-//   }
+    const items = result.Items
+    return items as TrackingItem[]
+  }
 
   async createTrackingDB(item: TrackingItem): Promise<TrackingItem> {
     await this.docClient

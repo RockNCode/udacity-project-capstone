@@ -58,20 +58,20 @@ functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # GetTodos:
-  #   handler: src/lambda/http/getTodos.handler
-  #   events:
-  #     - http:
-  #         method: get
-  #         path: todos
-  #         cors: true
-  #         auth: Auth
-  #   iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-todo-${self:provider.stage}
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #         - dynamodb:Query
-  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
+  GetTracking:
+    handler: src/lambda/http/getTracking.handler
+    events:
+      - http:
+          method: get
+          path: tracking
+          # cors: true
+          # auth: Auth
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-todo-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
 
   CreateTrackingItem:
     handler: src/lambda/http/createTracking.handler
