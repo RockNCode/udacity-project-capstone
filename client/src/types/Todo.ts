@@ -1,8 +1,9 @@
-export interface Todo {
-  todoId: string
-  createdAt: string
-  name: string
-  dueDate: string
-  done: boolean
-  attachmentUrl?: string
+export interface TrackingItem {
+  trackingId: string
+  userId: string
+  date: string
+  type: string
+  timeStart: string
+  duration: number
+  comments: string
 }

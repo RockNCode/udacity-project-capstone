@@ -16,7 +16,7 @@ import {
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
-import { Todo } from '../types/Todo'
+import { TrackingItem } from '../types/Todo'
 
 interface TodosProps {
   auth: Auth
@@ -24,7 +24,7 @@ interface TodosProps {
 }
 
 interface TodosState {
-  todos: Todo[]
+  todos: TrackingItem[]
   newTodoName: string
   loadingTodos: boolean
 }
@@ -56,7 +56,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         newTodoName: ''
       })
     } catch {
-      alert('Todo creation failed')
+      alert('Item creation failed')
     }
   }
 
@@ -64,30 +64,30 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     try {
       await deleteTodo(this.props.auth.getIdToken(), todoId)
       this.setState({
-        todos: this.state.todos.filter(todo => todo.todoId != todoId)
+        todos: this.state.todos.filter(todo => todo.trackingId != todoId)
       })
     } catch {
-      alert('Todo deletion failed')
+      alert('Item deletion failed')
     }
   }
 
-  onTodoCheck = async (pos: number) => {
-    try {
-      const todo = this.state.todos[pos]
-      await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
-        name: todo.name,
-        dueDate: todo.dueDate,
-        done: !todo.done
-      })
-      this.setState({
-        todos: update(this.state.todos, {
-          [pos]: { done: { $set: !todo.done } }
-        })
-      })
-    } catch {
-      alert('Todo deletion failed')
-    }
-  }
+  // onTodoCheck = async (pos: number) => {
+  //   try {
+  //     const todo = this.state.todos[pos]
+  //     await patchTodo(this.props.auth.getIdToken(), todo.trackingId, {
+  //       timeStart: todo.timeStart,
+  //       duration: todo.duration,
+  //       comments: todo.comments
+  //     })
+  //     this.setState({
+  //       todos: update(this.state.todos, {
+  //         [pos]: { done: { $set: !todo.done } }
+  //       })
+  //     })
+  //   } catch {
+  //     alert('Todo deletion failed')
+  //   }
+  // }
 
   async componentDidMount() {
     try {
@@ -104,7 +104,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   render() {
     return (
       <div>
-        <Header as="h1">TODOs</Header>
+        <Header as="h1">Baby Tracker</Header>
 
         {this.renderCreateTodoInput()}
 
@@ -122,12 +122,12 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               color: 'teal',
               labelPosition: 'left',
               icon: 'add',
-              content: 'New task',
+              content: 'New tracking item',
               onClick: this.onTodoCreate
             }}
             fluid
             actionPosition="left"
-            placeholder="To change the world..."
+            placeholder="nap time"
             onChange={this.handleNameChange}
           />
         </Grid.Column>
@@ -150,7 +150,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     return (
       <Grid.Row>
         <Loader indeterminate active inline="centered">
-          Loading TODOs
+          Loading tracking items
         </Loader>
       </Grid.Row>
     )
@@ -161,24 +161,33 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       <Grid padded>
         {this.state.todos.map((todo, pos) => {
           return (
-            <Grid.Row key={todo.todoId}>
-              <Grid.Column width={1} verticalAlign="middle">
+            <Grid.Row key={todo.trackingId}>
+              {/* <Grid.Column width={1} verticalAlign="middle">
                 <Checkbox
                   onChange={() => this.onTodoCheck(pos)}
                   checked={todo.done}
                 />
+              </Grid.Column> */}
+              <Grid.Column width={2} verticalAlign="middle">
+                {todo.date}
               </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
+              <Grid.Column width={2} floated="right" verticalAlign="middle">
+                {todo.type}
               </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {todo.dueDate}
+              <Grid.Column width={2} floated="right" verticalAlign="middle">
+                {todo.timeStart}
               </Grid.Column>
-              <Grid.Column width={1} floated="right">
+              <Grid.Column width={2} floated="right" verticalAlign="middle">
+                {todo.duration}
+              </Grid.Column>
+              <Grid.Column width={4} floated="right" verticalAlign="middle">
+                {todo.comments}
+              </Grid.Column>
+              <Grid.Column width={1} floated="right" >
                 <Button
                   icon
                   color="blue"
-                  onClick={() => this.onEditButtonClick(todo.todoId)}
+                  onClick={() => this.onEditButtonClick(todo.trackingId)}
                 >
                   <Icon name="pencil" />
                 </Button>
@@ -187,15 +196,15 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 <Button
                   icon
                   color="red"
-                  onClick={() => this.onTodoDelete(todo.todoId)}
+                  onClick={() => this.onTodoDelete(todo.trackingId)}
                 >
                   <Icon name="delete" />
                 </Button>
-              </Grid.Column>
+              {/* </Grid.Column>
               {todo.attachmentUrl && (
                 <Image src={todo.attachmentUrl} size="small" wrapped />
               )}
-              <Grid.Column width={16}>
+              <Grid.Column width={16}> */}
                 <Divider />
               </Grid.Column>
             </Grid.Row>
