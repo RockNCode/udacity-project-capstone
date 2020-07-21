@@ -2,6 +2,9 @@ import dateFormat from 'dateformat'
 import { History } from 'history'
 import update from 'immutability-helper'
 import * as React from 'react'
+//import * as DateTimePicker from 'react-datetime-picker';
+import DateTimePicker from "react-datetime-picker";
+
 import {
   Button,
   Checkbox,
@@ -26,15 +29,20 @@ interface TodosProps {
 interface TodosState {
   todos: TrackingItem[]
   newTodoName: string
-  loadingTodos: boolean
-}
+  loadingTodos: boolean,
+  date : Date
+} 
 
 export class Todos extends React.PureComponent<TodosProps, TodosState> {
   state: TodosState = {
     todos: [],
     newTodoName: '',
-    loadingTodos: true
+    loadingTodos: true,
+    date: new Date()
   }
+
+
+  onChanged = (date : Date) => this.setState({ date })
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newTodoName: event.target.value })
@@ -105,7 +113,12 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     return (
       <div>
         <Header as="h1">Baby Tracker</Header>
-
+        <div>
+        <DateTimePicker
+          onChange={this.onChanged}
+          value={this.state.date}
+        />
+      </div>
         {this.renderCreateTodoInput()}
 
         {this.renderTodos()}
