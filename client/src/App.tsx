@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link, Route, Router, Switch } from 'react-router-dom'
-import { Grid, Menu, Segment } from 'semantic-ui-react'
+import { Grid, Menu, Segment, Container,Button } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
 import { EditTodo } from './components/EditTodo'
@@ -24,6 +24,8 @@ export default class App extends Component<AppProps, AppState> {
     this.handleLogin = this.handleLogin.bind(this)
     this.handleLogout = this.handleLogout.bind(this)
   }
+  hideFixedMenu = () => this.setState({ fixed: false })
+  showFixedMenu = () => this.setState({ fixed: true })
 
   handleLogin() {
     this.props.auth.login()
@@ -34,6 +36,9 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   render() {
+    const { children } = this.props
+    //const { fixed } = this.state
+
     return (
       <div>
         <Segment style={{ padding: '8em 0em' }} vertical>
@@ -55,13 +60,30 @@ export default class App extends Component<AppProps, AppState> {
 
   generateMenu() {
     return (
-      <Menu>
-        <Menu.Item name="home">
-          <Link to="/">Home</Link>
-        </Menu.Item>
+      // <Menu>
+      //   <Menu.Item name="home">
+      //     <Link to="/">Home</Link>
+      //   </Menu.Item>
 
-        <Menu.Menu position="right">{this.logInLogOutButton()}</Menu.Menu>
-      </Menu>
+      //   <Menu.Menu position="right">{this.logInLogOutButton()}</Menu.Menu>
+      // </Menu>
+      <Menu
+              //fixed={fixed ? 'top' : null}
+              // inverted={!fixed}
+              // pointing={!fixed}
+              // secondary={!fixed}
+              size='large'
+            >
+              <Container>
+                <Menu.Item as='a' active>
+                  <Link to="/">Home</Link>
+                </Menu.Item>
+                <Menu.Item as='a'>Profile</Menu.Item>
+                <Menu.Item position='right'>
+                  {this.logInLogOutButton()}
+                </Menu.Item>
+              </Container>
+            </Menu>
     )
   }
 

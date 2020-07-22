@@ -14,7 +14,10 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
+  Container,
+  Segment,
+  Dropdown
 } from 'semantic-ui-react'
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
@@ -114,10 +117,6 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       <div>
         <Header as="h1">Baby Tracker</Header>
         <div>
-        <DateTimePicker
-          onChange={this.onChanged}
-          value={this.state.date}
-        />
       </div>
         {this.renderCreateTodoInput()}
 
@@ -126,31 +125,60 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
+  // renderCreateTodoInput() {
+  //   return (
+  //     <Grid.Row>
+  //       <Grid.Column width={16}>
+  //         <Input
+  //           action={{
+  //             color: 'teal',
+  //             labelPosition: 'left',
+  //             icon: 'add',
+  //             content: 'New tracking item',
+  //             onClick: this.onTodoCreate
+  //           }}
+  //           fluid
+  //           actionPosition="left"
+  //           placeholder="nap time"
+  //           onChange={this.handleNameChange}
+  //         />
+  //       </Grid.Column>
+  //       <Grid.Column width={16}>
+  //         <Divider />
+  //       </Grid.Column>
+  //     </Grid.Row>
+  //   )
+  // }
+
   renderCreateTodoInput() {
     return (
-      <Grid.Row>
-        <Grid.Column width={16}>
-          <Input
-            action={{
-              color: 'teal',
-              labelPosition: 'left',
-              icon: 'add',
-              content: 'New tracking item',
-              onClick: this.onTodoCreate
-            }}
-            fluid
-            actionPosition="left"
-            placeholder="nap time"
-            onChange={this.handleNameChange}
+      <Container text>
+      <Segment.Group>
+        <Segment>
+          <DateTimePicker
+            onChange={this.onChanged}
+            value={this.state.date}
           />
-        </Grid.Column>
-        <Grid.Column width={16}>
-          <Divider />
-        </Grid.Column>
-      </Grid.Row>
+        </Segment>
+        <Segment>
+        <Dropdown
+          options={[
+            { key: 'type', value: 'Nap', text: 'Nap' },
+            { key: 'type', value: 'Formula', text: 'Formula' },
+            { key: 'type', value: 'Breastfeed', text: 'Breastfeed' },
+                        
+          ]}
+          placeholder='Select'
+          selection
+        />
+        </Segment>
+        <Segment>Content</Segment>
+        <Segment>Content</Segment>
+      </Segment.Group>
+    </Container>
     )
-  }
 
+  }
   renderTodos() {
     if (this.state.loadingTodos) {
       return this.renderLoading()
