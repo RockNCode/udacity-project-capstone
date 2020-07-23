@@ -20,27 +20,27 @@ import {
   Dropdown
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTracking, deleteTracking, getTracking, patchTracking } from '../api/tracking-api'
 import Auth from '../auth/Auth'
-import { TrackingItem } from '../types/Todo'
+import { TrackingItem } from '../types/Tracking'
 
-interface TodosProps {
+interface TrackingProps {
   auth: Auth
   history: History
 }
 
-interface TodosState {
-  todos: TrackingItem[]
-  newTodoName: string
-  loadingTodos: boolean,
+interface TrackingState {
+  tracking: TrackingItem[]
+  newTrackingName: string
+  loadingTracking: boolean,
   date : Date
 } 
 
-export class Todos extends React.PureComponent<TodosProps, TodosState> {
-  state: TodosState = {
-    todos: [],
-    newTodoName: '',
-    loadingTodos: true,
+export class Tracking extends React.PureComponent<TrackingProps, TrackingState> {
+  state: TrackingState = {
+    tracking: [],
+    newTrackingName: '',
+    loadingTracking: true,
     date: new Date()
   }
 
@@ -48,67 +48,67 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   onChanged = (date : Date) => this.setState({ date })
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ newTodoName: event.target.value })
+    this.setState({ newTrackingName: event.target.value })
   }
 
-  onEditButtonClick = (todoId: string) => {
-    this.props.history.push(`/todos/${todoId}/edit`)
+  onEditButtonClick = (trackingId: string) => {
+    this.props.history.push(`/tracking/${trackingId}/edit`)
   }
 
-  onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+  onTrackingCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
     try {
       const dueDate = this.calculateDueDate()
-      const newTodo = await createTodo(this.props.auth.getIdToken(), {
-        name: this.state.newTodoName,
+      const newTracking = await createTracking(this.props.auth.getIdToken(), {
+        name: this.state.newTrackingName,
         dueDate
       })
       this.setState({
-        todos: [...this.state.todos, newTodo],
-        newTodoName: ''
+        tracking: [...this.state.tracking, newTracking],
+        newTrackingName: ''
       })
     } catch {
       alert('Item creation failed')
     }
   }
 
-  onTodoDelete = async (todoId: string) => {
+  onTrackingDelete = async (trackingId: string) => {
     try {
-      await deleteTodo(this.props.auth.getIdToken(), todoId)
+      await deleteTracking(this.props.auth.getIdToken(), trackingId)
       this.setState({
-        todos: this.state.todos.filter(todo => todo.trackingId != todoId)
+        tracking: this.state.tracking.filter(tracking => tracking.trackingId != trackingId)
       })
     } catch {
       alert('Item deletion failed')
     }
   }
 
-  // onTodoCheck = async (pos: number) => {
+  // onTrackingCheck = async (pos: number) => {
   //   try {
-  //     const todo = this.state.todos[pos]
-  //     await patchTodo(this.props.auth.getIdToken(), todo.trackingId, {
-  //       timeStart: todo.timeStart,
-  //       duration: todo.duration,
-  //       comments: todo.comments
+  //     const tracking = this.state.tracking[pos]
+  //     await patchTracking(this.props.auth.getIdToken(), tracking.trackingId, {
+  //       timeStart: tracking.timeStart,
+  //       duration: tracking.duration,
+  //       comments: tracking.comments
   //     })
   //     this.setState({
-  //       todos: update(this.state.todos, {
-  //         [pos]: { done: { $set: !todo.done } }
+  //       tracking: update(this.state.tracking, {
+  //         [pos]: { done: { $set: !tracking.done } }
   //       })
   //     })
   //   } catch {
-  //     alert('Todo deletion failed')
+  //     alert('Tracking deletion failed')
   //   }
   // }
 
   async componentDidMount() {
     try {
-      const todos = await getTodos(this.props.auth.getIdToken())
+      const tracking = await getTracking(this.props.auth.getIdToken())
       this.setState({
-        todos,
-        loadingTodos: false
+        tracking,
+        loadingTracking: false
       })
     } catch (e) {
-      alert(`Failed to fetch todos: ${e.message}`)
+      alert(`Failed to fetch tracking: ${e.message}`)
     }
   }
 
@@ -118,14 +118,14 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         <Header as="h1">Baby Tracker</Header>
         <div>
       </div>
-        {this.renderCreateTodoInput()}
+        {this.renderCreateTrackingInput()}
 
-        {this.renderTodos()}
+        {this.renderTracking()}
       </div>
     )
   }
 
-  // renderCreateTodoInput() {
+  // renderCreateTrackingInput() {
   //   return (
   //     <Grid.Row>
   //       <Grid.Column width={16}>
@@ -135,7 +135,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   //             labelPosition: 'left',
   //             icon: 'add',
   //             content: 'New tracking item',
-  //             onClick: this.onTodoCreate
+  //             onClick: this.onTrackingCreate
   //           }}
   //           fluid
   //           actionPosition="left"
@@ -150,7 +150,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   //   )
   // }
 
-  renderCreateTodoInput() {
+  renderCreateTrackingInput() {
     return (
       <Container text>
       <Segment.Group>
@@ -179,12 +179,12 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
 
   }
-  renderTodos() {
-    if (this.state.loadingTodos) {
+  renderTracking() {
+    if (this.state.loadingTracking) {
       return this.renderLoading()
     }
 
-    return this.renderTodosList()
+    return this.renderTrackingList()
   }
 
   renderLoading() {
@@ -197,38 +197,38 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
-  renderTodosList() {
+  renderTrackingList() {
     return (
       <Grid padded>
-        {this.state.todos.map((todo, pos) => {
+        {this.state.tracking.map((tracking, pos) => {
           return (
-            <Grid.Row key={todo.trackingId}>
+            <Grid.Row key={tracking.trackingId}>
               {/* <Grid.Column width={1} verticalAlign="middle">
                 <Checkbox
-                  onChange={() => this.onTodoCheck(pos)}
-                  checked={todo.done}
+                  onChange={() => this.onTrackingCheck(pos)}
+                  checked={tracking.done}
                 />
               </Grid.Column> */}
               <Grid.Column width={2} verticalAlign="middle">
-                {todo.date}
+                {tracking.date}
               </Grid.Column>
               <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {todo.type}
+                {tracking.type}
               </Grid.Column>
               <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {todo.timeStart}
+                {tracking.timeStart}
               </Grid.Column>
               <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {todo.duration}
+                {tracking.duration}
               </Grid.Column>
               <Grid.Column width={4} floated="right" verticalAlign="middle">
-                {todo.comments}
+                {tracking.comments}
               </Grid.Column>
               <Grid.Column width={1} floated="right" >
                 <Button
                   icon
                   color="blue"
-                  onClick={() => this.onEditButtonClick(todo.trackingId)}
+                  onClick={() => this.onEditButtonClick(tracking.trackingId)}
                 >
                   <Icon name="pencil" />
                 </Button>
@@ -237,13 +237,13 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 <Button
                   icon
                   color="red"
-                  onClick={() => this.onTodoDelete(todo.trackingId)}
+                  onClick={() => this.onTrackingDelete(tracking.trackingId)}
                 >
                   <Icon name="delete" />
                 </Button>
               {/* </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
+              {tracking.attachmentUrl && (
+                <Image src={tracking.attachmentUrl} size="small" wrapped />
               )}
               <Grid.Column width={16}> */}
                 <Divider />
