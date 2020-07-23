@@ -17,7 +17,10 @@ import {
   Loader,
   Container,
   Segment,
-  Dropdown
+  Dropdown,
+  Form,
+  Accordion,
+  FormField
 } from 'semantic-ui-react'
 
 import { createTracking, deleteTracking, getTracking, patchTracking } from '../api/tracking-api'
@@ -31,25 +34,65 @@ interface TrackingProps {
 
 interface TrackingState {
   tracking: TrackingItem[]
-  newTrackingName: string
+  newComment: string
   loadingTracking: boolean,
-  date : Date
+  date : Date,
+  activeIndex: number,
+  selectedType: string,
+  selectedHour: string,
+  selectedMinute: string,
+  errorStr: string
 } 
 
 export class Tracking extends React.PureComponent<TrackingProps, TrackingState> {
   state: TrackingState = {
     tracking: [],
-    newTrackingName: '',
+    newComment: '',
     loadingTracking: true,
-    date: new Date()
+    date: new Date(),
+    activeIndex: 0,
+    selectedType: 'none',
+    selectedHour: '',
+    selectedMinute: '',
+    errorStr: ''
   }
 
+  handleClick = (e, titleProps) => {
+    const { index } = titleProps
+    const { activeIndex } = this.state
+    const newIndex = activeIndex === index ? -1 : index
+
+    this.setState({ activeIndex: newIndex })
+  }
+
+  handleSubmit = (event,data) => {
+    console.log("Handling submit comment = "
+      + this.state.newComment
+      + " date = " + this.state.date)
+
+    let hour: number = parseInt(this.state.selectedHour)
+    let minute: number = parseInt(this.state.selectedMinute)
+    if(this.state.selectedType == 'Nap'){
+      if(hour <= 0 || hour >= 24){
+        this.state.errorStr+= 'Invalid hours input.\n'
+      }
+      if(hour <= 0 || hour >= 24){
+        this.state.errorStr+= 'Invalid hours input.\n'
+      }
+    }
+
+    if(this.state.errorStr != '') {
+      let err = this.state.errorStr
+      alert(err);
+      this.state.errorStr='';
+      return;
+    }
+
+    console.log("passed validation")
+  }
 
   onChanged = (date : Date) => this.setState({ date })
 
-  handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ newTrackingName: event.target.value })
-  }
 
   onEditButtonClick = (trackingId: string) => {
     this.props.history.push(`/tracking/${trackingId}/edit`)
@@ -59,12 +102,12 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     try {
       const dueDate = this.calculateDueDate()
       const newTracking = await createTracking(this.props.auth.getIdToken(), {
-        name: this.state.newTrackingName,
-        dueDate
+        type: this.state.selectedType,
+        comments: this.state.newComment
       })
       this.setState({
         tracking: [...this.state.tracking, newTracking],
-        newTrackingName: ''
+        newComment: ''
       })
     } catch {
       alert('Item creation failed')
@@ -81,7 +124,22 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       alert('Item deletion failed')
     }
   }
+  handleTypeChange = (event,data) => {
+    console.log("selected value is " + data.value)
+    this.setState({ selectedType: data.value })
+  }
+  handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ newComment: event.target.value })
+  }
 
+  handleHourChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log("hour = " + event.target.value)
+    this.setState({ newComment: event.target.value })
+  }
+  handleMinuteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log("minute = " + event.target.value)
+    this.setState({selectedMinute : event.target.value})
+  }
   // onTrackingCheck = async (pos: number) => {
   //   try {
   //     const tracking = this.state.tracking[pos]
@@ -151,31 +209,78 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   // }
 
   renderCreateTrackingInput() {
+    const options = [
+      { key: '1', value: 'Nap', text: 'Nap' },
+      { key: '2', value: 'Formula', text: 'Formula' },
+      { key: '3', value: 'Breastfeed', text: 'Breastfeed' },
+      { key: '4', value: 'Pee diaper', text: 'Pee diaper change' },
+      { key: '5', value: 'Poop diaper', text: 'Poop diaper change' },
+      { key: '6', value: 'Medication', text: 'Medication' },
+
+    ]
+    const { activeIndex } = this.state
+    
+    const HideableDuration = (props) => {
+      if(props.isVisible == true){
+        return <FormField>
+          <label>Duration</label>
+          <input type="text" placeholder='Hours'  onChange={this.handleHourChange} />
+          <input type="text" placeholder='Minutes' onChange = {this.handleMinuteChange}/>
+        </FormField>
+      }
+      return null;
+    }
+    
     return (
-      <Container text>
-      <Segment.Group>
-        <Segment>
-          <DateTimePicker
-            onChange={this.onChanged}
-            value={this.state.date}
-          />
-        </Segment>
-        <Segment>
-        <Dropdown
-          options={[
-            { key: 'type', value: 'Nap', text: 'Nap' },
-            { key: 'type', value: 'Formula', text: 'Formula' },
-            { key: 'type', value: 'Breastfeed', text: 'Breastfeed' },
-                        
-          ]}
-          placeholder='Select'
-          selection
-        />
-        </Segment>
-        <Segment>Content</Segment>
-        <Segment>Content</Segment>
-      </Segment.Group>
-    </Container>
+      <Accordion styled>
+        <Accordion.Title
+          active={activeIndex === 0}
+          index={0}
+          onClick={this.handleClick}
+        >
+          <Icon name='dropdown' />
+          New item
+        </Accordion.Title>
+        <Accordion.Content active={activeIndex === 0}>
+          <Segment.Group>
+            <Segment color='red' textAlign='center'>
+              <DateTimePicker
+                onChange={this.onChanged}
+                value={this.state.date}
+              />
+            </Segment>
+            
+            <Segment color= 'blue' >
+              <Form>
+              <Form.Select
+                  fluid
+                  label='Type'
+                  options={options}
+                  placeholder='Type'
+                  onChange={this.handleTypeChange}
+                />
+                
+                {/* <HideableDuration isVisible={this.state.selectedType == "Nap"}>                
+                </HideableDuration> */}
+                
+                <FormField >
+                  <label>Duration</label>
+                  <input type="number" min='0' max='24' placeholder='Hours'  onChange={this.handleHourChange} />
+                  <input type="number" min='0' max='60' placeholder='Minutes' onChange = {this.handleMinuteChange}/>
+                </FormField>
+                <Form.Field>
+                  <label>Comments</label>
+                  <input placeholder='Comments' onChange={this.handleCommentChange}/>
+                </Form.Field>
+                <Button type='submit' onClick={this.handleSubmit}>Submit</Button>
+
+              </Form>
+            </Segment>
+            
+          </Segment.Group>
+
+        </Accordion.Content>
+        </Accordion>
     )
 
   }
