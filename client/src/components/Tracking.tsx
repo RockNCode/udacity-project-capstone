@@ -39,8 +39,8 @@ interface TrackingState {
   date : Date,
   activeIndex: number,
   selectedType: string,
-  selectedHour: string,
-  selectedMinute: string,
+  selectedHour: number,
+  selectedMinute: number,
   errorStr: string
 } 
 
@@ -52,8 +52,8 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     date: new Date(),
     activeIndex: 0,
     selectedType: 'none',
-    selectedHour: '',
-    selectedMinute: '',
+    selectedHour: 0,
+    selectedMinute: 0,
     errorStr: ''
   }
 
@@ -70,16 +70,16 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       + this.state.newComment
       + " date = " + this.state.date)
 
-    let hour: number = parseInt(this.state.selectedHour)
-    let minute: number = parseInt(this.state.selectedMinute)
-    if(this.state.selectedType == 'Nap'){
-      if(hour <= 0 || hour >= 24){
-        this.state.errorStr+= 'Invalid hours input.\n'
-      }
-      if(hour <= 0 || hour >= 24){
-        this.state.errorStr+= 'Invalid hours input.\n'
-      }
-    }
+    // let hour: number = parseInt(this.state.selectedHour)
+    // let minute: number = parseInt(this.state.selectedMinute)
+    // if(this.state.selectedType == 'Nap'){
+    //   if(hour <= 0 || hour >= 24){
+    //     this.state.errorStr+= 'Invalid hours input.\n'
+    //   }
+    //   if(hour <= 0 || hour >= 24){
+    //     this.state.errorStr+= 'Invalid hours input.\n'
+    //   }
+    // }
 
     if(this.state.errorStr != '') {
       let err = this.state.errorStr
@@ -133,12 +133,34 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   }
 
   handleHourChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log("hour = " + event.target.value)
-    this.setState({ newComment: event.target.value })
+    console.log("hour = " + event.target.value)
+    let hour = parseInt(event.target.value);
+    if(hour >= 0 || hour <= 24)
+      this.setState({ selectedHour : hour })
+    
+    if(hour > 24){
+      this.setState({ selectedHour : 24 })
+      event.target.value = '24'
+    }
+    else if(hour<=0){
+      this.setState({ selectedHour : 0 })
+      event.target.value = '0'
+    }
+    
   }
   handleMinuteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log("minute = " + event.target.value)
-    this.setState({selectedMinute : event.target.value})
+    console.log("minute = " + event.target.value)
+    let min = parseInt(event.target.value);
+    if(min >= 0 || min <= 60)
+      this.setState({ selectedMinute : min })
+    if(min >= 60){
+      this.setState({ selectedMinute : 24 })
+      event.target.value = '60'
+    }
+    else if(min<=0){
+      this.setState({ selectedMinute : 0 })
+      event.target.value = '0'
+    }
   }
   // onTrackingCheck = async (pos: number) => {
   //   try {
@@ -219,17 +241,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
 
     ]
     const { activeIndex } = this.state
-    
-    const HideableDuration = (props) => {
-      if(props.isVisible == true){
-        return <FormField>
-          <label>Duration</label>
-          <input type="text" placeholder='Hours'  onChange={this.handleHourChange} />
-          <input type="text" placeholder='Minutes' onChange = {this.handleMinuteChange}/>
-        </FormField>
-      }
-      return null;
-    }
+
     
     return (
       <Accordion styled>
@@ -260,14 +272,14 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   onChange={this.handleTypeChange}
                 />
                 
-                {/* <HideableDuration isVisible={this.state.selectedType == "Nap"}>                
-                </HideableDuration> */}
-                
-                <FormField >
+                <FormField style={{display: this.getDurationVisibility(this.state.selectedType == 'Nap')}} >
                   <label>Duration</label>
-                  <input type="number" min='0' max='24' placeholder='Hours'  onChange={this.handleHourChange} />
-                  <input type="number" min='0' max='60' placeholder='Minutes' onChange = {this.handleMinuteChange}/>
+                  <input type="number" min='0' max='24'  placeholder='Hours'  
+                  onChange={ this.handleHourChange }  />
+                  <input type="number" min='0' max='60'  placeholder='Minutes' 
+                  onChange = {this.handleMinuteChange} /> 
                 </FormField>
+                
                 <Form.Field>
                   <label>Comments</label>
                   <input placeholder='Comments' onChange={this.handleCommentChange}/>
@@ -283,6 +295,9 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         </Accordion>
     )
 
+  }
+  getDurationVisibility = (isVisible) => {
+    return isVisible ? 'inline' : 'none'; 
   }
   renderTracking() {
     if (this.state.loadingTracking) {
