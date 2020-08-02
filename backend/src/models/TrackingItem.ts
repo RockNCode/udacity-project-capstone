@@ -3,7 +3,7 @@ export interface TrackingItem {
   userId: string
   date: string
   type: string
-  timeStart: string
   duration: number
+  amount:number
   comments: string
 }

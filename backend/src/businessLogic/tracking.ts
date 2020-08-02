@@ -25,8 +25,8 @@ export async function createTracking(
         userId,    
         date : createTrackingRequest.date,
         type: createTrackingRequest.type,
-        timeStart: createTrackingRequest.timeStart,
         duration: createTrackingRequest.duration,
+        amount: createTrackingRequest.amount,
         comments: createTrackingRequest.comments
     }
 

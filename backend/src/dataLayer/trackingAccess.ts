@@ -1,10 +1,10 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-import * as AWSXRay from 'aws-xray-sdk'
+//import * as AWSXRay from 'aws-xray-sdk'
 import { TrackingItem } from '../models/TrackingItem'
 import { TrackingUpdate } from '../models/TrackingUpdate'
 import * as AWS  from 'aws-sdk'
 
-const XAWS = AWSXRay.captureAWS(AWS)
+//const XAWS = AWSXRay.captureAWS(AWS)
 
 export class TrackingAccess {
 
@@ -14,7 +14,7 @@ export class TrackingAccess {
   }
 
   async getTrackingByUserId(userId : string ): Promise<TrackingItem[]> {
-    console.log('Getting all Todos for user')
+    console.log('Getting all Tracking items for user')
 
     const result = await this.docClient.query({
         TableName : this.trackingTable,
@@ -39,11 +39,12 @@ export class TrackingAccess {
     }
 
     async deleteTrackingById(userId : string, trackingId : string): Promise<any> {
+        console.log("Before delete UserId : " + userId + " Tracking id : " + trackingId)
         var params = {
             TableName:this.trackingTable,
               Key : {
                   "userId": userId,
-                  "todoId": trackingId
+                  "trackingId": trackingId
               }
             };
 
@@ -74,7 +75,7 @@ export class TrackingAccess {
     }
 
     async generatePresignedUrl(todoId : string) {
-        const s3 = new XAWS.S3({signatureVersion: 'v4'})
+        const s3 = new AWS.S3({signatureVersion: 'v4'})
         const signedUrlExpireSeconds = 60 * 5;
 
         return await s3.getSignedUrl('putObject', {

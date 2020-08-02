@@ -24,6 +24,7 @@ provider:
 
   environment:
     TRACKER_TABLE: ${self:provider.environment.PROJECT}-${self:provider.stage}
+    USERS_TABLE: users-${self:provider.stage}
     IMAGES_S3_BUCKET: images-${self:provider.environment.PROJECT}-${self:provider.stage}
     PROJECT: babytracker
 custom:
@@ -37,6 +38,8 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
+    stages: # deleteme
+      - dev
   s3:
     host: localhost
     directory: /tmp
@@ -64,8 +67,8 @@ functions:
       - http:
           method: get
           path: tracking
-          # cors: true
-          # auth: Auth
+          cors: true
+          auth: Auth
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-todo-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -172,16 +175,33 @@ resources:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: date
+          - AttributeName: trackingId
             AttributeType: S
 
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: date
+          - AttributeName: trackingId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TRACKER_TABLE}
+      
+    UsersDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: name
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.USERS_TABLE}
 
     ImagesBucket:
       Type: AWS::S3::Bucket
