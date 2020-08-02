@@ -21,7 +21,10 @@ import {
   Form,
   Accordion,
   FormField,
-  Message
+  Message,
+  Table,
+  Menu,
+  Label
 } from 'semantic-ui-react'
 
 import { createTracking, deleteTracking, getTracking, patchTracking } from '../api/tracking-api'
@@ -119,22 +122,6 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.props.history.push(`/tracking/${trackingId}/edit`)
   }
 
-  // onTrackingCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
-  //   try {
-  //     const dueDate = this.calculateDueDate()
-  //     const newTracking = await createTracking(this.props.auth.getIdToken(), {
-  //       type: this.state.selectedType,
-  //       comments: this.state.newComment
-  //     })
-  //     this.setState({
-  //       tracking: [...this.state.tracking, newTracking],
-  //       newComment: ''
-  //     })
-  //   } catch {
-  //     alert('Item creation failed')
-  //   }
-  // }
-
   onTrackingDelete = async (trackingId: string) => {
     try {
       await deleteTracking(this.props.auth.getIdToken(), trackingId)
@@ -172,11 +159,11 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   handleMinuteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("minute = " + event.target.value)
     let min = parseInt(event.target.value);
-    if(min >= 0 || min <= 60)
+    if(min >= 0 || min <= 59)
       this.setState({ selectedMinute : min })
-    if(min >= 60){
-      this.setState({ selectedMinute : 24 })
-      event.target.value = '60'
+    if(min > 59){
+      this.setState({ selectedMinute : 59 })
+      event.target.value = '59'
     }
     else if(min<=0){
       this.setState({ selectedMinute : 0 })
@@ -198,23 +185,6 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       event.target.value = '0'
     }
   }
-  // onTrackingCheck = async (pos: number) => {
-  //   try {
-  //     const tracking = this.state.tracking[pos]
-  //     await patchTracking(this.props.auth.getIdToken(), tracking.trackingId, {
-  //       timeStart: tracking.timeStart,
-  //       duration: tracking.duration,
-  //       comments: tracking.comments
-  //     })
-  //     this.setState({
-  //       tracking: update(this.state.tracking, {
-  //         [pos]: { done: { $set: !tracking.done } }
-  //       })
-  //     })
-  //   } catch {
-  //     alert('Tracking deletion failed')
-  //   }
-  // }
 
   async componentDidMount() {
     try {
@@ -234,37 +204,12 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         <Header as="h1">Baby Tracker</Header>
         <div>
       </div>
-        {this.renderCreateTrackingInput()}
-
+        {this.renderFilter()}
         {this.renderTracking()}
+        {this.renderCreateTrackingInput()}
       </div>
     )
   }
-
-  // renderCreateTrackingInput() {
-  //   return (
-  //     <Grid.Row>
-  //       <Grid.Column width={16}>
-  //         <Input
-  //           action={{
-  //             color: 'teal',
-  //             labelPosition: 'left',
-  //             icon: 'add',
-  //             content: 'New tracking item',
-  //             onClick: this.onTrackingCreate
-  //           }}
-  //           fluid
-  //           actionPosition="left"
-  //           placeholder="nap time"
-  //           onChange={this.handleNameChange}
-  //         />
-  //       </Grid.Column>
-  //       <Grid.Column width={16}>
-  //         <Divider />
-  //       </Grid.Column>
-  //     </Grid.Row>
-  //   )
-  // }
 
   renderCreateTrackingInput() {
     const options = [
@@ -312,7 +257,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   <label>Duration</label>
                   <input type="number" min='0' max='24'  placeholder='Hours'  
                   onChange={ this.handleHourChange }  />
-                  <input type="number" min='0' max='60'  placeholder='Minutes' 
+                  <input type="number" min='0' max='59'  placeholder='Minutes' 
                   onChange = {this.handleMinuteChange} /> 
                 </FormField>
                 <FormField style={{display: this.getVisibility(this.state.selectedType == 'Formula' 
@@ -363,62 +308,91 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       </Grid.Row>
     )
   }
+  renderFilter() {
+    const optionsFilter = [
+      { key: '1', value: 'Nap', text: 'Nap' },
+      { key: '2', value: 'Formula', text: 'Formula' },
+      { key: '3', value: 'Breastfeed', text: 'Breastfeed' },
+      { key: '4', value: 'Pee diaper', text: 'Pee diaper change' },
+      { key: '5', value: 'Poop diaper', text: 'Poop diaper change' },
+      { key: '6', value: 'Medication', text: 'Medication' },
+    ]
+    return (
+      <Form.Select
+                  fluid
+                  label='Type'
+                  options={optionsFilter}
+                  placeholder='Type'
+                  onChange={this.handleTypeChange}
+                />
+    )
+  }
 
   renderTrackingList() {
     return (
-      <Grid padded>
-        {this.state.tracking.map((tracking, pos) => {
-          return (
-            <Grid.Row key={tracking.trackingId}>
-              {/* <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => this.onTrackingCheck(pos)}
-                  checked={tracking.done}
-                />
-              </Grid.Column> */}
-              <Grid.Column width={2} verticalAlign="middle">
-                {tracking.date}
-              </Grid.Column>
-              <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {tracking.type}
-              </Grid.Column>
-              <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {tracking.timeStart}
-              </Grid.Column>
-              <Grid.Column width={2} floated="right" verticalAlign="middle">
-                {tracking.duration}
-              </Grid.Column>
-              <Grid.Column width={4} floated="right" verticalAlign="middle">
-                {tracking.comments}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right" >
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => this.onEditButtonClick(tracking.trackingId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => this.onTrackingDelete(tracking.trackingId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              {/* </Grid.Column>
-              {tracking.attachmentUrl && (
-                <Image src={tracking.attachmentUrl} size="small" wrapped />
-              )}
-              <Grid.Column width={16}> */}
-                <Divider />
-              </Grid.Column>
-            </Grid.Row>
-          )
-        })}
-      </Grid>
+      <Table celled>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Date</Table.HeaderCell>
+            <Table.HeaderCell>Type</Table.HeaderCell>
+            <Table.HeaderCell>Duration</Table.HeaderCell>
+            <Table.HeaderCell>Amount</Table.HeaderCell>
+            <Table.HeaderCell>Comments</Table.HeaderCell>
+            <Table.HeaderCell>Edit / Delete</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+
+        {
+          this.state.tracking.map((tracking, pos) => {
+            return(
+              <Table.Row>
+                <Table.Cell>{tracking.date}</Table.Cell>
+                <Table.Cell>{tracking.type}</Table.Cell>
+            <Table.Cell>{
+              Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
+                <Table.Cell>{tracking.amount}</Table.Cell>
+                <Table.Cell>{tracking.comments}</Table.Cell>
+                <Table.Cell>
+                  <Button
+                    icon
+                    color="blue"
+                    onClick={() => this.onEditButtonClick(tracking.trackingId)}
+                  >
+                    <Icon name="pencil" />
+                  </Button>
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => this.onTrackingDelete(tracking.trackingId)}
+                  >
+                    <Icon name="delete" />
+                  </Button>
+                </Table.Cell>
+
+              </Table.Row>)
+          })
+        }
+        </Table.Body>
+        <Table.Footer>
+        <Table.Row>
+          <Table.HeaderCell colSpan='3'>
+            <Menu floated='right' pagination>
+              <Menu.Item as='a' icon>
+                <Icon name='chevron left' />
+              </Menu.Item>
+              <Menu.Item as='a'>1</Menu.Item>
+              <Menu.Item as='a'>2</Menu.Item>
+              <Menu.Item as='a'>3</Menu.Item>
+              <Menu.Item as='a'>4</Menu.Item>
+              <Menu.Item as='a' icon>
+                <Icon name='chevron right' />
+              </Menu.Item>
+            </Menu>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Footer>
+    </Table>
     )
   }
 
