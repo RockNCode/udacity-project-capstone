@@ -20,7 +20,8 @@ import {
   Dropdown,
   Form,
   Accordion,
-  FormField
+  FormField,
+  Message
 } from 'semantic-ui-react'
 
 import { createTracking, deleteTracking, getTracking, patchTracking } from '../api/tracking-api'
@@ -41,6 +42,7 @@ interface TrackingState {
   selectedType: string,
   selectedHour: number,
   selectedMinute: number,
+  selectedAmount: number,
   errorStr: string
 } 
 
@@ -54,6 +56,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     selectedType: 'none',
     selectedHour: 0,
     selectedMinute: 0,
+    selectedAmount: 0,
     errorStr: ''
   }
 
@@ -65,7 +68,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.setState({ activeIndex: newIndex })
   }
 
-  handleSubmit = (event,data) => {
+  handleSubmit = async (event,data) => {
     console.log("Handling submit comment = "
       + this.state.newComment
       + " date = " + this.state.date)
@@ -89,6 +92,24 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     }
 
     console.log("passed validation")
+
+    try {
+      const mDate = this.state.date.toISOString();
+      const mDuration = this.state.selectedHour * 60 + this.state.selectedMinute;
+      const newTracking = await createTracking(this.props.auth.getIdToken(), {
+        date: mDate,
+        type: this.state.selectedType,
+        duration: mDuration,
+        amount: this.state.selectedAmount,
+        comments: this.state.newComment
+      })
+      this.setState({
+        tracking: [...this.state.tracking, newTracking],
+        newComment: ''
+      })
+    } catch(e) {
+      alert('Item creation failed: ' + e)
+    }
   }
 
   onChanged = (date : Date) => this.setState({ date })
@@ -98,21 +119,21 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.props.history.push(`/tracking/${trackingId}/edit`)
   }
 
-  onTrackingCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
-    try {
-      const dueDate = this.calculateDueDate()
-      const newTracking = await createTracking(this.props.auth.getIdToken(), {
-        type: this.state.selectedType,
-        comments: this.state.newComment
-      })
-      this.setState({
-        tracking: [...this.state.tracking, newTracking],
-        newComment: ''
-      })
-    } catch {
-      alert('Item creation failed')
-    }
-  }
+  // onTrackingCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+  //   try {
+  //     const dueDate = this.calculateDueDate()
+  //     const newTracking = await createTracking(this.props.auth.getIdToken(), {
+  //       type: this.state.selectedType,
+  //       comments: this.state.newComment
+  //     })
+  //     this.setState({
+  //       tracking: [...this.state.tracking, newTracking],
+  //       newComment: ''
+  //     })
+  //   } catch {
+  //     alert('Item creation failed')
+  //   }
+  // }
 
   onTrackingDelete = async (trackingId: string) => {
     try {
@@ -159,6 +180,21 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     }
     else if(min<=0){
       this.setState({ selectedMinute : 0 })
+      event.target.value = '0'
+    }
+  }
+
+  handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("amount = " + event.target.value)
+    let amount = parseInt(event.target.value);
+    if(amount >= 0 || amount <= 1000)
+      this.setState({ selectedAmount : amount })
+    if(amount >= 1000){
+      this.setState({ selectedAmount : 1000 })
+      event.target.value = '1000'
+    }
+    else if(amount<=0){
+      this.setState({ selectedAmount : 0 })
       event.target.value = '0'
     }
   }
@@ -263,7 +299,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
             </Segment>
             
             <Segment color= 'blue' >
-              <Form>
+              <Form error>
               <Form.Select
                   fluid
                   label='Type'
@@ -272,12 +308,19 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   onChange={this.handleTypeChange}
                 />
                 
-                <FormField style={{display: this.getDurationVisibility(this.state.selectedType == 'Nap')}} >
+                <FormField style={{display: this.getVisibility(this.state.selectedType == 'Nap')}} >
                   <label>Duration</label>
                   <input type="number" min='0' max='24'  placeholder='Hours'  
                   onChange={ this.handleHourChange }  />
                   <input type="number" min='0' max='60'  placeholder='Minutes' 
                   onChange = {this.handleMinuteChange} /> 
+                </FormField>
+                <FormField style={{display: this.getVisibility(this.state.selectedType == 'Formula' 
+                                                              || this.state.selectedType == 'Breastfeed')}} >
+                  <label>Amount (ML)</label>
+                  <input type="number" min='0' max='1000'  placeholder='120'  
+                  onChange={ this.handleAmountChange }  />
+ 
                 </FormField>
                 
                 <Form.Field>
@@ -285,7 +328,11 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   <input placeholder='Comments' onChange={this.handleCommentChange}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.handleSubmit}>Submit</Button>
-
+                <Message style={{display: 'none'}}
+                  error
+                  header='Input validation error'
+                  content={this.state.errorStr}
+                />
               </Form>
             </Segment>
             
@@ -296,7 +343,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     )
 
   }
-  getDurationVisibility = (isVisible) => {
+  getVisibility = (isVisible) => {
     return isVisible ? 'inline' : 'none'; 
   }
   renderTracking() {

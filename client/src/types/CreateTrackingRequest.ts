@@ -1,4 +1,7 @@
 export interface CreateTrackingRequest {
-  type: string,
+  date: string
+  type: string
+  duration: number
+  amount:number
   comments: string
 }

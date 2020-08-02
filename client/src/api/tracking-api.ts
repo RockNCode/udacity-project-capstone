@@ -21,6 +21,7 @@ export async function createTracking(
   idToken: string,
   newTracking: CreateTrackingRequest
 ): Promise<TrackingItem> {
+  console.log("Tracking obj : " + JSON.stringify(newTracking))
   const response = await Axios.post(`${apiEndpoint}/tracking`,  JSON.stringify(newTracking), {
     headers: {
       'Content-Type': 'application/json',
