@@ -63,6 +63,12 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     errorStr: ''
   }
 
+  clearFormState = () => {
+    this.setState({newComment: ''})
+    this.setState({selectedHour: 0})
+    this.setState({selectedMinute: 0})
+    this.setState({selectedAmount: 0})
+  }
   handleClick = (e, titleProps) => {
     const { index } = titleProps
     const { activeIndex } = this.state
@@ -113,6 +119,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     } catch(e) {
       alert('Item creation failed: ' + e)
     }
+    this.clearFormState();
   }
 
   onChanged = (date : Date) => this.setState({ date })
@@ -135,6 +142,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   handleTypeChange = (event,data) => {
     console.log("selected value is " + data.value)
     this.setState({ selectedType: data.value })
+    this.clearFormState();
   }
   handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newComment: event.target.value })
@@ -255,22 +263,22 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                 
                 <FormField style={{display: this.getVisibility(this.state.selectedType == 'Nap')}} >
                   <label>Duration</label>
-                  <input type="number" min='0' max='24'  placeholder='Hours'  
+                  <input type="number" min='0' max='24'  placeholder='Hours'  value = {this.state.selectedHour}
                   onChange={ this.handleHourChange }  />
-                  <input type="number" min='0' max='59'  placeholder='Minutes' 
+                  <input type="number" min='0' max='59'  placeholder='Minutes' value = {this.state.selectedMinute}
                   onChange = {this.handleMinuteChange} /> 
                 </FormField>
                 <FormField style={{display: this.getVisibility(this.state.selectedType == 'Formula' 
                                                               || this.state.selectedType == 'Breastfeed')}} >
                   <label>Amount (ML)</label>
-                  <input type="number" min='0' max='1000'  placeholder='120'  
+                  <input type="number" min='0' max='1000'  placeholder='120'  value = {this.state.selectedAmount}
                   onChange={ this.handleAmountChange }  />
  
                 </FormField>
                 
                 <Form.Field>
                   <label>Comments</label>
-                  <input placeholder='Comments' onChange={this.handleCommentChange}/>
+                  <input placeholder='Comments' onChange={this.handleCommentChange} value = {this.state.newComment}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.handleSubmit}>Submit</Button>
                 <Message style={{display: 'none'}}
@@ -309,7 +317,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     )
   }
   renderFilter() {
-    const optionsFilter = [
+    const optionsTypeFilter = [
       { key: '1', value: 'Nap', text: 'Nap' },
       { key: '2', value: 'Formula', text: 'Formula' },
       { key: '3', value: 'Breastfeed', text: 'Breastfeed' },
@@ -321,7 +329,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       <Form.Select
                   fluid
                   label='Type'
-                  options={optionsFilter}
+                  options={optionsTypeFilter}
                   placeholder='Type'
                   onChange={this.handleTypeChange}
                 />
@@ -351,7 +359,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                 <Table.Cell>{tracking.type}</Table.Cell>
             <Table.Cell>{
               Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
-                <Table.Cell>{tracking.amount}</Table.Cell>
+                <Table.Cell>{tracking.amount} ML</Table.Cell>
                 <Table.Cell>{tracking.comments}</Table.Cell>
                 <Table.Cell>
                   <Button
