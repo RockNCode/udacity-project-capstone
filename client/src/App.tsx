@@ -78,7 +78,9 @@ export default class App extends Component<AppProps, AppState> {
                 <Menu.Item as='a' active>
                   <Link to="/">Home</Link>
                 </Menu.Item>
-                <Menu.Item as='a'>Profile</Menu.Item>
+                <Menu.Item as='a'>
+                <Link to="/tracking/edit">Profile</Link>
+                </Menu.Item>
                 <Menu.Item position='right'>
                   {this.logInLogOutButton()}
                 </Menu.Item>
@@ -119,7 +121,7 @@ export default class App extends Component<AppProps, AppState> {
         />
 
         <Route
-          path="/tracking/:trackingId/edit"
+          path="/tracking/edit"
           exact
           render={props => {
             return <EditTracking {...props} auth={this.props.auth} />

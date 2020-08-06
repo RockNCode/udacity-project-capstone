@@ -82,17 +82,6 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       + this.state.newComment
       + " date = " + this.state.date)
 
-    // let hour: number = parseInt(this.state.selectedHour)
-    // let minute: number = parseInt(this.state.selectedMinute)
-    // if(this.state.selectedType == 'Nap'){
-    //   if(hour <= 0 || hour >= 24){
-    //     this.state.errorStr+= 'Invalid hours input.\n'
-    //   }
-    //   if(hour <= 0 || hour >= 24){
-    //     this.state.errorStr+= 'Invalid hours input.\n'
-    //   }
-    // }
-
     if(this.state.errorStr != '') {
       let err = this.state.errorStr
       alert(err);
@@ -281,7 +270,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   <input placeholder='Comments' onChange={this.handleCommentChange} value = {this.state.newComment}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.handleSubmit}>Submit</Button>
-                <Message style={{display: 'none'}}
+                <Message style={{display: this.getErrorVisibility()  }}
                   error
                   header='Input validation error'
                   content={this.state.errorStr}
@@ -296,6 +285,11 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     )
 
   }
+
+  getErrorVisibility = () => {
+    return this.state.errorStr == '' ? 'none' : 'block'
+  }
+
   getVisibility = (isVisible) => {
     return isVisible ? 'inline' : 'none'; 
   }

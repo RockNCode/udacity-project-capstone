@@ -73,7 +73,7 @@ export class EditTracking extends React.PureComponent<
   render() {
     return (
       <div>
-        <h1>Upload new image</h1>
+        <h1>Profile</h1>
 
         <Form onSubmit={this.handleSubmit}>
           <Form.Field>
