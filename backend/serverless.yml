@@ -75,6 +75,21 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
+  
+  GetProfile:
+    handler: src/lambda/http/getUser.handler
+    events:
+      - http:
+          method: get
+          path: profile
+          cors: true
+          auth: Auth
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-profile-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
 
   CreateTrackingItem:
     handler: src/lambda/http/createTracking.handler
@@ -117,6 +132,29 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRACKER_TABLE}
+
+  UpdateUser:
+    handler: src/lambda/http/updateUser.handler
+    events:
+      - http:
+          method: patch
+          path: profile
+          # cors: true
+          # authorizer : Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update user
+            description: Update user
+            # ToDo
+            # requestModels:
+            #   'application/json': ${self:provider.environment.PROJECT}RequestSchema
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-user-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
+
 
   DeleteTodo:
     handler: src/lambda/http/deleteTracking.handler
@@ -192,14 +230,14 @@ resources:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: name
-            AttributeType: S
+          # - AttributeName: name
+          #   AttributeType: S
 
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: name
-            KeyType: RANGE
+          # - AttributeName: name
+          #   KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.USERS_TABLE}
 

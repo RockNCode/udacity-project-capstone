@@ -1,17 +1,23 @@
 import * as uuid from 'uuid'
 import { TrackingItem } from '../models/TrackingItem'
+import { UserUpdate } from '../models/UserUpdate'
 import { TrackingUpdate } from '../models/TrackingUpdate'
 
 import { TrackingAccess } from '../dataLayer/trackingAccess'
 import { CreateTrackingRequest } from '../requests/CreateTrackingRequest'
 // import { CreateTodoRequest } from '../requests/CreateTrackingRequest'
 import { UpdateTrackingRequest } from '../requests/UpdateTrackingRequest'
+import { UpdateUserRequest } from '../requests/UpdateUserRequest'
 
 const trackingAccess = new TrackingAccess()
 // const bucket = process.env.IMAGES_S3_BUCKET
 
 export async function getAllTrackingItemsById(userId): Promise<TrackingItem[]> {
     return await trackingAccess.getTrackingByUserId(userId)
+}
+
+export async function getProfileItemsById(userId): Promise<UserUpdate[]> {
+    return await trackingAccess.getProfileByUserId(userId)
 }
 
 export async function createTracking(
@@ -37,13 +43,21 @@ export async function createTracking(
       return await trackingAccess.deleteTrackingById(userId, trackingId);
   }
 
-  export async function updateTrackingById(updateTodoRequest : UpdateTrackingRequest,
+  export async function updateTrackingById(updateTrackingRequest : UpdateTrackingRequest,
     userId: string, trackingId : string) {
         const item : TrackingUpdate = {
-            ...updateTodoRequest,
+            ...updateTrackingRequest,
         }
     return await trackingAccess.updateTrackingById(item,userId,trackingId);
 
+  }
+
+  export async function updateUserByName(updateUserRequest : UpdateUserRequest,
+    userId: string) {
+        const item : UserUpdate = {
+            ...updateUserRequest,
+        }
+    return await trackingAccess.updateUser(item,userId);
   }
 
   export async function generatePresignedUploadToS3(todoId: string)  {
