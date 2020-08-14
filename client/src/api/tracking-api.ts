@@ -3,6 +3,7 @@ import { TrackingItem } from '../types/Tracking';
 import { CreateTrackingRequest } from '../types/CreateTrackingRequest';
 import Axios from 'axios'
 import { UpdateTrackingRequest } from '../types/UpdateTrackingRequest';
+import { ProfileItem } from '../types/ProfileItem';
 
 export async function getTracking(idToken: string): Promise<TrackingItem[]> {
   console.log('Fetching tracking items')
@@ -14,6 +15,19 @@ export async function getTracking(idToken: string): Promise<TrackingItem[]> {
     },
   })
   console.log('Trackings:', response.data)
+  return response.data.items
+}
+
+export async function getProfileInfo(idToken: string): Promise<ProfileItem[]> {
+  console.log('Fetching profile items')
+
+  const response = await Axios.get(`${apiEndpoint}/profile`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    },
+  })
+  console.log('profile:', response.data)
   return response.data.items
 }
 

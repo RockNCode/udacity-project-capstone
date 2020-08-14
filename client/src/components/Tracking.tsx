@@ -27,9 +27,10 @@ import {
   Label
 } from 'semantic-ui-react'
 
-import { createTracking, deleteTracking, getTracking, patchTracking } from '../api/tracking-api'
+import { createTracking, deleteTracking, getTracking, patchTracking, getProfileInfo } from '../api/tracking-api'
 import Auth from '../auth/Auth'
 import { TrackingItem } from '../types/Tracking'
+import { runInThisContext } from 'vm';
 
 interface TrackingProps {
   auth: Auth
@@ -47,7 +48,24 @@ interface TrackingState {
   selectedMinute: number,
   selectedAmount: number,
   errorStr: string
-} 
+  goalAmount: number
+  goalsInfoMilk: string
+  goalsInfoSleep: string
+  goalsInfoPee: string
+  goalsInfoPoop: string
+
+  milkAmount : number 
+  sleepAmount : number
+  peeAmount : number
+  poopAmount : number
+}
+
+interface ProfileInfo {
+  targetSleep: number
+  targetMilk: number
+  targetPee: number
+  targetPoop: number
+}
 
 export class Tracking extends React.PureComponent<TrackingProps, TrackingState> {
   state: TrackingState = {
@@ -60,7 +78,24 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     selectedHour: 0,
     selectedMinute: 0,
     selectedAmount: 0,
-    errorStr: ''
+    errorStr: '',
+    goalAmount: 800, // ToDo Set to 0 by default, needs to be read from profile table.
+    goalsInfoMilk: '',
+    goalsInfoSleep: '',
+    goalsInfoPee: '',
+    goalsInfoPoop: '',
+
+    milkAmount : 0,
+    sleepAmount : 0,
+    peeAmount : 0,
+    poopAmount : 0
+  }
+
+  profileInfo: ProfileInfo = {
+    targetSleep: 0,
+    targetMilk: 0,
+    targetPee: 0,
+    targetPoop: 0,
   }
 
   clearFormState = () => {
@@ -105,6 +140,8 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         tracking: [...this.state.tracking, newTracking],
         newComment: ''
       })
+      this.calculateGoalsInfo(newTracking,"add");
+
     } catch(e) {
       alert('Item creation failed: ' + e)
     }
@@ -118,11 +155,12 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.props.history.push(`/tracking/${trackingId}/edit`)
   }
 
-  onTrackingDelete = async (trackingId: string) => {
+  onTrackingDelete = async (itemToDelete: TrackingItem) => {
     try {
-      await deleteTracking(this.props.auth.getIdToken(), trackingId)
+      await deleteTracking(this.props.auth.getIdToken(), itemToDelete.trackingId)
+      this.calculateGoalsInfo(itemToDelete,"delete")
       this.setState({
-        tracking: this.state.tracking.filter(tracking => tracking.trackingId != trackingId)
+        tracking: this.state.tracking.filter(tracking => tracking.trackingId != itemToDelete.trackingId)
       })
     } catch {
       alert('Item deletion failed')
@@ -185,13 +223,69 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
 
   async componentDidMount() {
     try {
+      const profile = await getProfileInfo(this.props.auth.getIdToken());
+      console.log("Profile is : " + JSON.stringify(profile[0]));
+      this.profileInfo.targetMilk = profile[0].targetmilk;
+      this.profileInfo.targetPee = profile[0].targetpee;
+      this.profileInfo.targetPoop = profile[0].targetpoop;
+      this.profileInfo.targetSleep = profile[0].targetsleep;
+    } catch(e){
+      alert(`Failed to fetch profile: ${e.message}`)
+    }
+
+    try {
       const tracking = await getTracking(this.props.auth.getIdToken())
+      console.log("Tracking is : " + JSON.stringify(tracking))
+
+
+      for(var i =0; i < tracking.length; i++) {
+        let item = tracking[i];
+        this.calculateGoalsInfo(item,"add");
+      }
+
       this.setState({
         tracking,
         loadingTracking: false
       })
+
     } catch (e) {
       alert(`Failed to fetch tracking: ${e.message}`)
+    }
+
+
+  }
+
+  private calculateGoalsInfo(item: TrackingItem,what: string) {
+    if (item.type == "Formula" || item.type == "Breastfeed")
+      this.state.milkAmount += what == "add"? item.amount: -item.amount;
+    if (item.type == "Nap")
+      this.state.sleepAmount += what == "add"?  item.duration: -item.duration;
+    if (item.type == "Pee diaper")
+      this.state.peeAmount += what == "add"? 1 : -1;
+    if (item.type == "Poop diaper")
+      this.state.poopAmount += what == "add"? 1 : -1;
+
+    if (this.state.milkAmount >= this.profileInfo.targetMilk) {
+      this.state.goalsInfoMilk = "The ML amount of feeds has been met \n";
+    } else {
+      this.state.goalsInfoMilk = "";
+    }
+    if (this.state.sleepAmount >= this.profileInfo.targetSleep) {
+      this.state.goalsInfoSleep = "The target time of sleeping has been met \n";
+    }
+    else {
+      this.state.goalsInfoSleep = "";
+    }
+    if (this.state.peeAmount >= this.profileInfo.targetPee) {
+      this.state.goalsInfoPee = "The number of pee diapers for the day has been met \n";
+    }else {
+      this.state.goalsInfoPee = "";
+    }
+    if (this.state.poopAmount >= this.profileInfo.targetPoop) {
+      this.state.goalsInfoPoop = "The number of poop diapers for the day has been met \n";
+    }
+    else {
+      this.state.goalsInfoPoop = "";
     }
   }
 
@@ -201,6 +295,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         <Header as="h1">Baby Tracker</Header>
         <div>
       </div>
+        {this.renderGoalsInfo()}
         {this.renderFilter()}
         {this.renderTracking()}
         {this.renderCreateTrackingInput()}
@@ -329,7 +424,19 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                 />
     )
   }
+  renderGoalsInfo() {
+    return(
+      <Message info>
+        <Message.Header>Goals Information</Message.Header>
+          <p>{this.state.goalsInfoMilk}</p>
+          <p>{this.state.goalsInfoSleep}</p>
+          <p>{this.state.goalsInfoPee}</p>
+          <p>{this.state.goalsInfoPoop}</p>
 
+      </Message>
+    )
+  }
+  
   renderTrackingList() {
     return (
       <Table celled>
@@ -366,7 +473,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   <Button
                     icon
                     color="red"
-                    onClick={() => this.onTrackingDelete(tracking.trackingId)}
+                    onClick={() => this.onTrackingDelete(tracking)}
                   >
                     <Icon name="delete" />
                   </Button>
