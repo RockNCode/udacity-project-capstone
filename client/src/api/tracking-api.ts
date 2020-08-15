@@ -58,6 +58,19 @@ export async function patchTracking(
   })
 }
 
+export async function patchProfile(
+  idToken: string,
+  profileItem : ProfileItem
+): Promise<void> {
+  console.log("at patch profile : "  + JSON.stringify(profileItem) +  " id token : "+ idToken)
+  await Axios.patch(`${apiEndpoint}/profile`, JSON.stringify(profileItem), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+}
+
 export async function deleteTracking(
   idToken: string,
   trackingId: string
@@ -74,12 +87,15 @@ export async function getUploadUrl(
   idToken: string,
   trackingId: string
 ): Promise<string> {
-  const response = await Axios.post(`${apiEndpoint}/tracking/${trackingId}/attachment`, '', {
+  console.log("Calling api  new" + `${apiEndpoint}/profile/attachment`)
+  const response = await Axios.post(`${apiEndpoint}/profile/attachment`, '', {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
     }
   })
+
+  console.log("Upload URL IS " + response.data.uploadUrl)
   return response.data.uploadUrl
 }
 

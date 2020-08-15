@@ -256,6 +256,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   }
 
   private calculateGoalsInfo(item: TrackingItem,what: string) {
+    console.log("At calculate goals unfo current diaper am : " + this.state.peeAmount)
     if (item.type == "Formula" || item.type == "Breastfeed")
       this.state.milkAmount += what == "add"? item.amount: -item.amount;
     if (item.type == "Nap")
@@ -266,26 +267,26 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       this.state.poopAmount += what == "add"? 1 : -1;
 
     if (this.state.milkAmount >= this.profileInfo.targetMilk) {
-      this.state.goalsInfoMilk = "The ML amount of feeds has been met \n";
+      this.setState({goalsInfoMilk : "The ML amount of feeds has been met \n"});
     } else {
       this.state.goalsInfoMilk = "";
     }
     if (this.state.sleepAmount >= this.profileInfo.targetSleep) {
-      this.state.goalsInfoSleep = "The target time of sleeping has been met \n";
+      this.setState({goalsInfoSleep : "The target time of sleeping has been met \n"});
     }
     else {
-      this.state.goalsInfoSleep = "";
+      this.setState({goalsInfoSleep : ""});
     }
     if (this.state.peeAmount >= this.profileInfo.targetPee) {
-      this.state.goalsInfoPee = "The number of pee diapers for the day has been met \n";
+      this.setState({goalsInfoPee : "The number of pee diapers for the day has been met \n"});
     }else {
-      this.state.goalsInfoPee = "";
+      this.setState({goalsInfoPee : ""});
     }
     if (this.state.poopAmount >= this.profileInfo.targetPoop) {
-      this.state.goalsInfoPoop = "The number of poop diapers for the day has been met \n";
+      this.setState({goalsInfoPoop :"The number of poop diapers for the day has been met \n"});
     }
     else {
-      this.state.goalsInfoPoop = "";
+      this.setState({goalsInfoPoop : ""});
     }
   }
 
