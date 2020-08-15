@@ -26,7 +26,7 @@ provider:
     TRACKER_TABLE: ${self:provider.environment.PROJECT}-${self:provider.stage}
     USERS_TABLE: users-${self:provider.stage}
     IMAGES_S3_BUCKET: images-${self:provider.environment.PROJECT}-${self:provider.stage}
-    PROJECT: babytracker
+    PROJECT: babytrack
 custom:
   topicName: ${self:provider.environment.PROJECT}-Topic-${self:provider.stage}
   # Local config
@@ -69,7 +69,7 @@ functions:
           path: tracking
           cors: true
           auth: Auth
-    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-todo-${self:provider.stage}
+    iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -97,14 +97,14 @@ functions:
       - http:
           method: post
           path: tracking
-          # cors: true
-          # authorizer : Auth
-          reqValidatorName: RequestBodyValidator
+          cors: true
+          authorizer : Auth
+          #reqValidatorName: RequestBodyValidator
           documentation:
             summary: Create Tracking Item
             description: Create Tracking item
-            requestModels:
-              'application/json': ${self:provider.environment.PROJECT}RequestSchema
+            #requestModels:
+            #  'application/json': ${self:provider.environment.PROJECT}RequestSchema
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-create-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -118,8 +118,8 @@ functions:
       - http:
           method: patch
           path: tracking/{trackingId}
-          # cors: true
-          # authorizer : Auth
+          cors: true
+          authorizer : Auth
           reqValidatorName: RequestBodyValidator
           documentation:
             summary: Update tracking
@@ -139,8 +139,8 @@ functions:
       - http:
           method: patch
           path: profile
-          # cors: true
-          # authorizer : Auth
+          cors: true
+          authorizer : Auth
           reqValidatorName: RequestBodyValidator
           documentation:
             summary: Update user
@@ -162,8 +162,8 @@ functions:
       - http:
           method: delete
           path: tracking/{trackingId}
-          # cors: true
-          # authorizer : Auth
+          cors: true
+          authorizer : Auth
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-delete-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -176,9 +176,9 @@ functions:
     events:
       - http:
           method: post
-          path: tracking/{trackingId}/attachment
-          # cors: true
-          # authorizer : Auth
+          path: profile/attachment
+          cors: true
+          authorizer : Auth
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-upload-s3-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow

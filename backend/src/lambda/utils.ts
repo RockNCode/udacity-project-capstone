@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-//import { parseUserId } from "../auth/utils";
+import { parseUserId } from "../auth/utils";
 
 /**
  * Get a user id from an API Gateway event
@@ -10,16 +10,13 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import * as AWS  from 'aws-sdk'
 
 export function getUserId(event: APIGatewayProxyEvent): string {
-  event // delete this line
-  // const authorization = event.headers.Authorization
-  // const split = authorization.split(' ')
-  // const jwtToken = split[1]
+  const authorization = event.headers.Authorization
+  const split = authorization.split(' ')
+  const jwtToken = split[1]
 
-  // return parseUserId(jwtToken)
+  return parseUserId(jwtToken)
 
-  // HACK return single user for now
-  return "mgarcia"
-}
+ }
 
 export function createDynamoDbClient(){
   if(process.env.IS_OFFLINE) {
