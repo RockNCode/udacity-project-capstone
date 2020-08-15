@@ -67,31 +67,26 @@ export class EditTracking extends React.PureComponent<
     event.preventDefault()
 
     try {
-      if (!this.state.file) {
-        alert('File should be selected')
-        return
+      if (this.state.file) {
+        this.setUploadState(UploadState.FetchingPresignedUrl)
+        const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.trackingId)
+        console.log("Upload url is: " + uploadUrl)
+        this.setUploadState(UploadState.UploadingFile)
+        await uploadFile(uploadUrl, this.state.file)
       }
-
-      this.setUploadState(UploadState.FetchingPresignedUrl)
-      const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.trackingId)
-      console.log("Upload url is: " + uploadUrl)
-      this.setUploadState(UploadState.UploadingFile)
-      await uploadFile(uploadUrl, this.state.file)
       const profileItem : any = {
         targetMilk: this.state.targetMilk,
         targetSleep: Math.floor(this.state.targetSleepHours / 60) + this.state.targetSleepMinutes,
         targetPoop: this.state.targetPoop,
         targetPee: this.state.targetPee,
         name: this.state.fullName,
-        fileUrl: uploadUrl,
+        fileUrl: '',
         age: this.state.age
       }
-      alert('File was uploaded!')
-
       await patchProfile(this.props.auth.getIdToken(),profileItem)
 
     } catch (e) {
-      alert('Could not upload a file: ' + e.message)
+      alert('Error updating profile: ' + e.message)
     } finally {
       this.setUploadState(UploadState.NoUpload)
       // Hack to force image reload no caching
@@ -146,14 +141,16 @@ export class EditTracking extends React.PureComponent<
     this.setState({ targetPoop : parseInt(event.target.value) })
   }
 
-
+  getVisibility = (isVisible) => {
+    return isVisible ? 'inline' : 'none';
+  }
   render() {
     return (
       <div>
         <h1>Profile</h1>
 
         <Form onSubmit={this.handleSubmit}>
-          <Form.Field>
+          <Form.Field >
             <img src={this.state.imgSrc} width="200" height="200"/>
           </Form.Field>
           <Form.Field>
