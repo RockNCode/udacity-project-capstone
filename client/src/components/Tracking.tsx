@@ -48,6 +48,7 @@ interface TrackingState {
   selectedMinute: number,
   selectedAmount: number,
   errorStr: string
+  goalsErr: string
   goalAmount: number
   goalsInfoMilk: string
   goalsInfoSleep: string
@@ -79,6 +80,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     selectedMinute: 0,
     selectedAmount: 0,
     errorStr: '',
+    goalsErr: '',
     goalAmount: 800, // ToDo Set to 0 by default, needs to be read from profile table.
     goalsInfoMilk: '',
     goalsInfoSleep: '',
@@ -230,7 +232,8 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       this.profileInfo.targetPoop = profile[0].targetpoop;
       this.profileInfo.targetSleep = profile[0].targetsleep;
     } catch(e){
-      alert(`Failed to fetch profile: ${e.message}`)
+      console.log(`Failed to fetch profile: ${e.message}`)
+      this.setState({goalsErr : "Don't forget to fill out your profile with goals information"})
     }
 
     try {
@@ -297,6 +300,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         <div>
       </div>
         {this.renderGoalsInfo()}
+        {this.renderGoalsError()}
         {this.renderFilter()}
         {this.renderTracking()}
         {this.renderCreateTrackingInput()}
@@ -366,7 +370,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   <input placeholder='Comments' onChange={this.handleCommentChange} value = {this.state.newComment}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.handleSubmit}>Submit</Button>
-                <Message style={{display: this.getErrorVisibility()  }}
+                <Message style={{display: this.getErrorVisibility(this.state.errorStr)  }}
                   error
                   header='Input validation error'
                   content={this.state.errorStr}
@@ -382,8 +386,8 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
 
   }
 
-  getErrorVisibility = () => {
-    return this.state.errorStr == '' ? 'none' : 'block'
+  getErrorVisibility = (stringToCheck) => {
+    return stringToCheck == '' ? 'none' : 'block'
   }
 
   getVisibility = (isVisible) => {
@@ -437,6 +441,14 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       </Message>
     )
   }
+  renderGoalsError() {
+    return(
+    <Message style={{display: this.getErrorVisibility(this.state.goalsErr)  }}
+      error
+      header='Profile missing'
+      content={this.state.goalsErr}
+    />)
+  }
   
   renderTrackingList() {
     return (
@@ -462,7 +474,10 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
             <Table.Cell>{
               Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
                 <Table.Cell>{tracking.amount} ML</Table.Cell>
-                <Table.Cell>{tracking.comments}</Table.Cell>
+                <Table.Cell>
+                  <input value = {tracking.comments} 
+                />
+                </Table.Cell>
                 <Table.Cell>
                   <Button
                     icon

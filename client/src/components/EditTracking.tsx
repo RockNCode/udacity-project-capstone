@@ -73,10 +73,11 @@ export class EditTracking extends React.PureComponent<
         console.log("Upload url is: " + uploadUrl)
         this.setUploadState(UploadState.UploadingFile)
         await uploadFile(uploadUrl, this.state.file)
+        
       }
       const profileItem : any = {
         targetMilk: this.state.targetMilk,
-        targetSleep: Math.floor(this.state.targetSleepHours / 60) + this.state.targetSleepMinutes,
+        targetSleep: Math.floor(this.state.targetSleepHours * 60) + this.state.targetSleepMinutes,
         targetPoop: this.state.targetPoop,
         targetPee: this.state.targetPee,
         name: this.state.fullName,
@@ -84,13 +85,14 @@ export class EditTracking extends React.PureComponent<
         age: this.state.age
       }
       await patchProfile(this.props.auth.getIdToken(),profileItem)
+      // Hack to force image reload no caching
+      let mDate : Date = new Date();
+      this.setState({imgSrc: "https://images-babytrack-dev.s3.amazonaws.com/" +this.state.userId + "?dummy=" + mDate.toISOString() })
 
     } catch (e) {
       alert('Error updating profile: ' + e.message)
     } finally {
       this.setUploadState(UploadState.NoUpload)
-      // Hack to force image reload no caching
-      this.setState({imgSrc: "https://images-babytrack-dev.s3.amazonaws.com/" +this.state.userId + "?dummy=" + Math.floor(Math.random() * 200) })
 
     }
   }
@@ -128,9 +130,23 @@ export class EditTracking extends React.PureComponent<
   handleTargetMilkChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ targetMilk : parseInt(event.target.value) })
   }
+  
   handleTargetSleepChangeHours = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ targetSleepHours : parseInt(event.target.value) })
+    console.log("hour = " + event.target.value)
+    let hour = parseInt(event.target.value);
+    if(hour >= 0 || hour <= 24)
+      this.setState({ targetSleepHours : hour })
+    
+    if(hour > 24){
+      this.setState({ targetSleepHours : 24 })
+      event.target.value = '24'
+    }
+    else if(hour<=0){
+      this.setState({ targetSleepHours : 0 })
+      event.target.value = '0'
+    }  
   }
+
   handleTargetSleepChangeMinutes = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ targetSleepMinutes : parseInt(event.target.value) })
   }
@@ -163,8 +179,8 @@ export class EditTracking extends React.PureComponent<
           </Form.Field>
           <Form.Field>
             <label>Target sleep time per day</label>
-            <input placeholder='Hours' type="number" value={this.state.targetSleepHours} onChange={ this.handleTargetSleepChangeHours } />
-            <input placeholder='Minutes' type="number" value={this.state.targetSleepMinutes} onChange={ this.handleTargetSleepChangeMinutes }/>
+            <input type="number" min='0' max='24'  placeholder='Hours' value={this.state.targetSleepHours} onChange={ this.handleTargetSleepChangeHours } />
+            <input type="number" min='0' max='59' placeholder='Minutes'  value={this.state.targetSleepMinutes} onChange={ this.handleTargetSleepChangeMinutes }/>
           </Form.Field>
           <Form.Field>
             <label>Target milk per day</label>
