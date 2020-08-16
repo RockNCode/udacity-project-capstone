@@ -153,7 +153,10 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.clearFormState();
   }
 
-  onChanged = (date : Date) => this.setState({ date })
+  onChanged = async (date : Date) => {
+    this.setState({ date })
+    this.updateTrackingTable(date);
+  }
 
 
   onEditButtonClick = async (pos: number) => {
@@ -282,28 +285,34 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       console.log(`Failed to fetch profile: ${e.message}`)
       this.setState({goalsErr : "Don't forget to fill out your profile with goals information"})
     }
+    let currentDate = new Date();
+    await this.updateTrackingTable(currentDate);
 
+
+  }
+
+  private async updateTrackingTable(dateToFilter: Date) {
     try {
-      let currentDate = new Date();
-      const tracking = await getTracking(this.props.auth.getIdToken(),currentDate.getTime().toString())
-      console.log("Tracking is : " + JSON.stringify(tracking))
+      this.setState({tracking: []})
+      let currentDate = dateToFilter;
+      const tracking = await getTracking(this.props.auth.getIdToken(), currentDate.getTime().toString());
+      console.log("Tracking is : " + JSON.stringify(tracking));
 
 
-      for(var i =0; i < tracking.length; i++) {
+      for (var i = 0; i < tracking.length; i++) {
         let item = tracking[i];
-        this.calculateGoalsInfo(item,"add");
+        this.calculateGoalsInfo(item, "add");
       }
 
       this.setState({
         tracking,
         loadingTracking: false
-      })
+      });
 
-    } catch (e) {
-      alert(`Failed to fetch tracking: ${e.message}`)
     }
-
-
+    catch (e) {
+      alert(`Failed to fetch tracking: ${e.message}`);
+    }
   }
 
   private calculateGoalsInfo(item: TrackingItem,what: string) {
@@ -386,7 +395,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
           onClick={this.handleClick}
         >
           <Icon name='dropdown' />
-          New item
+          Create new item at selected date / time.
         </Accordion.Title>
         <Accordion.Content active={activeIndex === 0}>
           <Segment.Group>
