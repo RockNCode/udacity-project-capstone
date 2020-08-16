@@ -6,9 +6,13 @@ const utils = require("../utils.ts")
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   // TODO: Get all TODO items for a current user
-  console.log('Caller event', event)
+  console.log('Caller event :', event)
   const userId = utils.getUserId(event);
-  const result = await getAllTrackingItemsById(userId);
+  const isoDate = event.pathParameters.isoDate;
+  console.log("AT GET CALL isoDate : "  + isoDate)
+
+
+  const result = await getAllTrackingItemsById(userId,isoDate);
   console.log("Getting profile from user: " + userId + " result to return " + JSON.stringify(result))
   return {
     statusCode: 200,

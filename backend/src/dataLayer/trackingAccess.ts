@@ -16,19 +16,35 @@ export class TrackingAccess {
     private readonly usersTable = process.env.USERS_TABLE) {
   }
 
-  async getTrackingByUserId(userId : string ): Promise<TrackingItem[]> {
-    console.log('Getting all Tracking items for user')
+  async getTrackingByUserId(userId : string, isoDate : string ): Promise<TrackingItem[]> {
+    console.log('Getting all Tracking items for user with IsoDate' + isoDate)
+    let d = new Date(parseInt(isoDate));
+    console.log("Date at DB read is : "+ d)
+    let curr_month = d.getMonth() ;
+    let curr_day = d.getDate();
+    let curr_year = d.getFullYear();
+    // let curr_hour = d.getHours();
+    // let curr_min = d.getMinutes();
+    let dateStart= new Date(curr_year,curr_month,curr_day,0,0,0,0); // time start 0:00 UTC
+    let dateEnd= new Date(curr_year,curr_month,curr_day,23,59,59,99); // time start 0:00 UTC
 
+    let isoStart = dateStart.toISOString();
+    let isoEnd = dateEnd.toISOString();
+    console.log("Checking times between : " + dateStart + " and " + dateEnd);
     const result = await this.docClient.query({
         TableName : this.trackingTable,
         KeyConditionExpression: 'userId = :userId',
         ExpressionAttributeValues: {
             ':userId': userId
+            // ':dateStart':isoStart,
+            // ':dateEnd':isoEnd
         }
     }).promise()
 
     const items = result.Items
-    return items as TrackingItem[]
+    const itemsFiltered = items.filter(item => (item.date >= isoStart && item.date < isoEnd) );
+    console.log("Filtered items : " + JSON.stringify(itemsFiltered))
+    return itemsFiltered as TrackingItem[]
   }
 
   async getProfileByUserId(userId : string ): Promise<UserUpdate[]> {
@@ -97,7 +113,7 @@ export class TrackingAccess {
         await this.docClient.update(params).promise()
         return item
     }
-    
+
     async updateUser(item : UserUpdate,
       userId : string,
       // name : string,

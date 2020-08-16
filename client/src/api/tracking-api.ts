@@ -5,10 +5,10 @@ import Axios from 'axios'
 import { UpdateTrackingRequest } from '../types/UpdateTrackingRequest';
 import { ProfileItem } from '../types/ProfileItem';
 
-export async function getTracking(idToken: string): Promise<TrackingItem[]> {
-  console.log('Fetching tracking items')
+export async function getTracking(idToken: string, isoDate: string): Promise<TrackingItem[]> {
+  console.log('Fetching tracking items from api ' + `${apiEndpoint}/trackingdate/${isoDate}`)
 
-  const response = await Axios.get(`${apiEndpoint}/tracking`, {
+  const response = await Axios.get(`${apiEndpoint}/trackingdate/`+isoDate, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`

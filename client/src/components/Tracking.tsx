@@ -163,6 +163,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         duration : itemToUpdate.duration,
         amount: itemToUpdate.amount,
         comments : itemToUpdate.comments,
+        date: itemToUpdate.date
       }
       await patchTracking(this.props.auth.getIdToken(),itemToUpdate.trackingId,trackingUpdateRequest)
       let newTrackingUpdate = this.state.tracking.slice() //copy the array
@@ -283,7 +284,8 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     }
 
     try {
-      const tracking = await getTracking(this.props.auth.getIdToken())
+      let currentDate = new Date();
+      const tracking = await getTracking(this.props.auth.getIdToken(),currentDate.getTime().toString())
       console.log("Tracking is : " + JSON.stringify(tracking))
 
 

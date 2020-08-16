@@ -12,8 +12,8 @@ import { UpdateUserRequest } from '../requests/UpdateUserRequest'
 const trackingAccess = new TrackingAccess()
 // const bucket = process.env.IMAGES_S3_BUCKET
 
-export async function getAllTrackingItemsById(userId): Promise<TrackingItem[]> {
-    return await trackingAccess.getTrackingByUserId(userId)
+export async function getAllTrackingItemsById(userId,isoDate): Promise<TrackingItem[]> {
+    return await trackingAccess.getTrackingByUserId(userId,isoDate)
 }
 
 export async function getProfileItemsById(userId): Promise<UserUpdate[]> {

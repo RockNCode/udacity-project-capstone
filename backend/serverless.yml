@@ -17,7 +17,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
-  # TODO uncomment when full code is enabled.
+  #TODO uncomment when full code is enabled.
   # tracing:
   #   lambda: true
   #   apiGateway: true
@@ -66,9 +66,13 @@ functions:
     events:
       - http:
           method: get
-          path: tracking
+          path: trackingdate/{isoDate}
           cors: true
           auth: Auth
+          # request:
+          #   parameters:
+          #     paths:
+          #       isoDate: true
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -99,12 +103,12 @@ functions:
           path: tracking
           cors: true
           authorizer : Auth
-          #reqValidatorName: RequestBodyValidator
+          reqValidatorName: RequestBodyValidator
           documentation:
             summary: Create Tracking Item
             description: Create Tracking item
-            #requestModels:
-            #  'application/json': ${self:provider.environment.PROJECT}RequestSchema
+            requestModels:
+              'application/json': ${self:provider.environment.PROJECT}RequestSchema
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-create-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -221,6 +225,7 @@ resources:
             KeyType: HASH
           - AttributeName: trackingId
             KeyType: RANGE
+
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TRACKER_TABLE}
       
