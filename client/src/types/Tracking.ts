@@ -7,4 +7,5 @@ export interface TrackingItem {
   duration: number
   amount:number
   comments: string
+  modified: boolean
 }

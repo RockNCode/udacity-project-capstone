@@ -1,5 +1,5 @@
 export interface UpdateTrackingRequest {
-  timeStart: string
   duration: number
+  amount:number
   comments: string
 }

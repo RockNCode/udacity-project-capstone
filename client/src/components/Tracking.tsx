@@ -31,6 +31,7 @@ import { createTracking, deleteTracking, getTracking, patchTracking, getProfileI
 import Auth from '../auth/Auth'
 import { TrackingItem } from '../types/Tracking'
 import { runInThisContext } from 'vm';
+import { UpdateTrackingRequest } from '../types/UpdateTrackingRequest';
 
 interface TrackingProps {
   auth: Auth
@@ -44,6 +45,7 @@ interface TrackingState {
   date : Date,
   activeIndex: number,
   selectedType: string,
+  tableFilterType: string,
   selectedHour: number,
   selectedMinute: number,
   selectedAmount: number,
@@ -76,6 +78,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     date: new Date(),
     activeIndex: 0,
     selectedType: 'none',
+    tableFilterType: 'none',
     selectedHour: 0,
     selectedMinute: 0,
     selectedAmount: 0,
@@ -153,8 +156,21 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   onChanged = (date : Date) => this.setState({ date })
 
 
-  onEditButtonClick = (trackingId: string) => {
-    this.props.history.push(`/tracking/${trackingId}/edit`)
+  onEditButtonClick = async (pos: number) => {
+    try {
+      let itemToUpdate = this.state.tracking[pos];
+      let trackingUpdateRequest: UpdateTrackingRequest = {
+        duration : itemToUpdate.duration,
+        amount: itemToUpdate.amount,
+        comments : itemToUpdate.comments,
+      }
+      await patchTracking(this.props.auth.getIdToken(),itemToUpdate.trackingId,trackingUpdateRequest)
+      let newTrackingUpdate = this.state.tracking.slice() //copy the array
+      newTrackingUpdate[pos].modified = false;
+      this.setState({tracking: newTrackingUpdate}) //set the new state
+    } catch {
+      alert('Item update failed')
+    }
   }
 
   onTrackingDelete = async (itemToDelete: TrackingItem) => {
@@ -173,8 +189,32 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
     this.setState({ selectedType: data.value })
     this.clearFormState();
   }
+
+  handleFilterTableChange = (event,data) => {
+    console.log("selected value  for filter table is " + data.value)
+    this.setState({ tableFilterType: data.value })
+    //this.clearFormState();
+  }
+
   handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newComment: event.target.value })
+  }
+  handleCommentTableChange = (event: React.ChangeEvent<HTMLInputElement>,pos,type) => {
+
+    let newTrackingUpdate = this.state.tracking.slice() //copy the array
+    switch(type) {
+      case "comments":
+        newTrackingUpdate[pos].comments = event.target.value
+        break;
+      case "amount":
+        newTrackingUpdate[pos].amount = parseInt(event.target.value) 
+        break;
+      default:
+        console.log("Should not be here")
+        break;
+    }
+    newTrackingUpdate[pos].modified = true;
+    this.setState({tracking: newTrackingUpdate}) //set the new state
   }
 
   handleHourChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -393,6 +433,9 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   getVisibility = (isVisible) => {
     return isVisible ? 'inline' : 'none'; 
   }
+  getTableVisibility = (isVisible) => {
+    return isVisible ? 'inline-block' : 'none'; 
+  }
   renderTracking() {
     if (this.state.loadingTracking) {
       return this.renderLoading()
@@ -425,7 +468,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                   label='Type'
                   options={optionsTypeFilter}
                   placeholder='Type'
-                  onChange={this.handleTypeChange}
+                  onChange={this.handleFilterTableChange}
                 />
     )
   }
@@ -457,8 +500,11 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
           <Table.Row>
             <Table.HeaderCell>Date</Table.HeaderCell>
             <Table.HeaderCell>Type</Table.HeaderCell>
-            <Table.HeaderCell>Duration</Table.HeaderCell>
-            <Table.HeaderCell>Amount</Table.HeaderCell>
+            <Table.HeaderCell 
+              >
+              Duration
+              </Table.HeaderCell>
+            <Table.HeaderCell>Amount (ML)</Table.HeaderCell>
             <Table.HeaderCell>Comments</Table.HeaderCell>
             <Table.HeaderCell>Edit / Delete</Table.HeaderCell>
           </Table.Row>
@@ -471,20 +517,23 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
               <Table.Row>
                 <Table.Cell>{tracking.date}</Table.Cell>
                 <Table.Cell>{tracking.type}</Table.Cell>
-            <Table.Cell>{
-              Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
-                <Table.Cell>{tracking.amount} ML</Table.Cell>
+                <Table.Cell>{
+                  Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
                 <Table.Cell>
-                  <input value = {tracking.comments} 
+                  <input type="number" value = {this.state.tracking[pos].amount} onChange={(e) => this.handleCommentTableChange (e, pos,"amount")}/>
+                </Table.Cell>
+                <Table.Cell>
+                  <input value = {this.state.tracking[pos].comments} onChange={(e) => this.handleCommentTableChange (e, pos,"comments")}
                 />
                 </Table.Cell>
                 <Table.Cell>
                   <Button
                     icon
-                    color="blue"
-                    onClick={() => this.onEditButtonClick(tracking.trackingId)}
+                    color="green"
+                    onClick={() => this.onEditButtonClick(pos)}
+                    style={{display: this.getVisibility(tracking.modified)}}
                   >
-                    <Icon name="pencil" />
+                    <Icon name="check circle" />
                   </Button>
                   <Button
                     icon

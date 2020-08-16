@@ -1,5 +1,5 @@
 export interface TrackingUpdate {
-  timeStart: string
+  amount: number
   duration: number
   comments: string
 }

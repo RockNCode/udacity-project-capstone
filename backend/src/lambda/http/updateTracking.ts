@@ -5,7 +5,7 @@ const utils = require("../utils.ts")
 import { UpdateTrackingRequest } from '../../requests/UpdateTrackingRequest'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const trackingId = event.pathParameters.todoId
+  const trackingId = event.pathParameters.trackingId
   const updateData: UpdateTrackingRequest = JSON.parse(event.body)
   const userId = utils.getUserId(event);
 

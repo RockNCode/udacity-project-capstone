@@ -77,21 +77,23 @@ export class TrackingAccess {
                         userId : string,
                         trackingId : string,
                      ): Promise<TrackingUpdate> {
+                       console.log("At updating tracking by id, item is " + JSON.stringify(item))
         var params = {
             TableName:this.trackingTable,
             Key:{
                 "userId": userId,
                 "trackingId": trackingId
             },
-            //ExpressionAttributeNames: { "#myname": "name" },
-            UpdateExpression: "set timeStart = :timeStart, duration=:duration, comments=:comments",
+            ExpressionAttributeNames: { "#myduration": "duration" },
+            UpdateExpression: "set amount = :amount, #myduration=:taskduration, comments=:comments",
             ExpressionAttributeValues:{
-                ":timeStart":item.timeStart,
-                ":duration":item.duration,
-                ":comment": item.comments
+                ":amount":item.amount,
+                ":taskduration":item.duration,
+                ":comments": item.comments
             },
             ReturnValues:"UPDATED_NEW"
           };
+        console.log("Params are : " + JSON.stringify(params))
         await this.docClient.update(params).promise()
         return item
     }
