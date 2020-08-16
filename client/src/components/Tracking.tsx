@@ -199,7 +199,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newComment: event.target.value })
   }
-  handleCommentTableChange = (event: React.ChangeEvent<HTMLInputElement>,pos,type) => {
+  handleTableChange = (event: React.ChangeEvent<HTMLInputElement>,pos,type) => {
 
     let newTrackingUpdate = this.state.tracking.slice() //copy the array
     switch(type) {
@@ -208,6 +208,12 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         break;
       case "amount":
         newTrackingUpdate[pos].amount = parseInt(event.target.value) 
+        break;
+      case "durationHour":
+        newTrackingUpdate[pos].duration = newTrackingUpdate[pos].duration % 60 + parseInt(event.target.value) * 60
+        break;
+      case "durationMinutes":
+        newTrackingUpdate[pos].duration =  (newTrackingUpdate[pos].duration - newTrackingUpdate[pos].duration % 60) + parseInt(event.target.value);
         break;
       default:
         console.log("Should not be here")
@@ -341,13 +347,22 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       </div>
         {this.renderGoalsInfo()}
         {this.renderGoalsError()}
+        {this.renderDatePicker()}
         {this.renderFilter()}
         {this.renderTracking()}
         {this.renderCreateTrackingInput()}
       </div>
     )
   }
+  renderDatePicker() {
+    return(
+      <DateTimePicker
+        onChange={this.onChanged}
+        value={this.state.date}
+      />
 
+    )
+  }
   renderCreateTrackingInput() {
     const options = [
       { key: '1', value: 'Nap', text: 'Nap' },
@@ -373,13 +388,6 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         </Accordion.Title>
         <Accordion.Content active={activeIndex === 0}>
           <Segment.Group>
-            <Segment color='red' textAlign='center'>
-              <DateTimePicker
-                onChange={this.onChanged}
-                value={this.state.date}
-              />
-            </Segment>
-            
             <Segment color= 'blue' >
               <Form error>
               <Form.Select
@@ -517,13 +525,17 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
               <Table.Row>
                 <Table.Cell>{tracking.date}</Table.Cell>
                 <Table.Cell>{tracking.type}</Table.Cell>
-                <Table.Cell>{
-                  Math.floor(tracking.duration / 60) } hours {tracking.duration % 60} minutes</Table.Cell>
                 <Table.Cell>
-                  <input type="number" value = {this.state.tracking[pos].amount} onChange={(e) => this.handleCommentTableChange (e, pos,"amount")}/>
+                  <input type="number" defaultValue = {""+Math.floor(this.state.tracking[pos].duration / 60)} onChange={(e) => this.handleTableChange (e, pos,"durationHour")}/>
+                  <label>hours</label>
+                  <input type="number" defaultValue = {""+this.state.tracking[pos].duration % 60} onChange={(e) => this.handleTableChange (e, pos,"durationMinutes")}/>
+                  <label>minutes</label>
                 </Table.Cell>
                 <Table.Cell>
-                  <input value = {this.state.tracking[pos].comments} onChange={(e) => this.handleCommentTableChange (e, pos,"comments")}
+                  <input type="number" value = {this.state.tracking[pos].amount} onChange={(e) => this.handleTableChange (e, pos,"amount")}/>
+                </Table.Cell>
+                <Table.Cell>
+                  <input value = {this.state.tracking[pos].comments} onChange={(e) => this.handleTableChange (e, pos,"comments")}
                 />
                 </Table.Cell>
                 <Table.Cell>
@@ -549,7 +561,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         }
         </Table.Body>
         <Table.Footer>
-        <Table.Row>
+        {/* <Table.Row>
           <Table.HeaderCell colSpan='3'>
             <Menu floated='right' pagination>
               <Menu.Item as='a' icon>
@@ -564,7 +576,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
               </Menu.Item>
             </Menu>
           </Table.HeaderCell>
-        </Table.Row>
+        </Table.Row> */}
       </Table.Footer>
     </Table>
     )
