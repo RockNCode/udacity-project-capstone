@@ -367,10 +367,14 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
   }
   renderDatePicker() {
     return(
-      <DateTimePicker
-        onChange={this.onChanged}
-        value={this.state.date}
-      />
+      <Grid.Row>
+        <label>Choose a date     </label>
+        <DateTimePicker
+          onChange={this.onChanged}
+          value={this.state.date}
+        />
+
+      </Grid.Row>
 
     )
   }
@@ -382,6 +386,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
       { key: '4', value: 'Pee diaper', text: 'Pee diaper change' },
       { key: '5', value: 'Poop diaper', text: 'Poop diaper change' },
       { key: '6', value: 'Medication', text: 'Medication' },
+      { key: '7', value: 'Nap', text: 'All' },
 
     ]
     const { activeIndex } = this.state
@@ -537,13 +542,13 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
                 <Table.Cell>{tracking.date}</Table.Cell>
                 <Table.Cell>{tracking.type}</Table.Cell>
                 <Table.Cell>
-                  <input type="number" defaultValue = {""+Math.floor(this.state.tracking[pos].duration / 60)} onChange={(e) => this.handleTableChange (e, pos,"durationHour")}/>
-                  <label>hours</label>
-                  <input type="number" defaultValue = {""+this.state.tracking[pos].duration % 60} onChange={(e) => this.handleTableChange (e, pos,"durationMinutes")}/>
-                  <label>minutes</label>
+                  <input style={{display: this.getVisibility(tracking.type == "Nap")}} type="number" defaultValue = {""+Math.floor(this.state.tracking[pos].duration / 60)} onChange={(e) => this.handleTableChange (e, pos,"durationHour")}/>
+                  <label style={{display: this.getVisibility(tracking.type == "Nap")}}>hours</label>
+                  <input style={{display: this.getVisibility(tracking.type == "Nap")}} type="number" defaultValue = {""+this.state.tracking[pos].duration % 60} onChange={(e) => this.handleTableChange (e, pos,"durationMinutes")}/>
+                  <label style={{display: this.getVisibility(tracking.type == "Nap")}}>minutes</label>
                 </Table.Cell>
                 <Table.Cell>
-                  <input type="number" value = {this.state.tracking[pos].amount} onChange={(e) => this.handleTableChange (e, pos,"amount")}/>
+                  <input style={{display: this.getVisibility(tracking.type == "Formula" || tracking.type == "Breastfeed")}}type="number" value = {this.state.tracking[pos].amount} onChange={(e) => this.handleTableChange (e, pos,"amount")}/>
                 </Table.Cell>
                 <Table.Cell>
                   <input value = {this.state.tracking[pos].comments} onChange={(e) => this.handleTableChange (e, pos,"comments")}
