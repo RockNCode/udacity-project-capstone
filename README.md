@@ -58,11 +58,6 @@ Note: There is a frontend issue, when the user uploads an image for the first ti
 
 # Back to the main screen.
 
-## Date/time picker
-
-The date picker acts both as a date filter for the table and as time chooser for the new item creation. You can add items on different dates and times by changing the values on the date filter and it will also display different information on the table as you change it.  
-![Date Time](/images/DateTime.png)
-
 ## The table
 
 ### Item creation
@@ -70,6 +65,7 @@ The date picker acts both as a date filter for the table and as time chooser for
 #### Date time picker
 
 As mentioned before, the date time picker acts both as a date/time chooser for the item being created as well as a filter for the table. This is so that the user has the flexibility to add items on passed dates in case some information was missing. And also if you switch the day, you'll see the information displayed on the table changes to the one for that day.
+![Date Time](/images/DateTime.png)
 
 
 #### Item creation form
