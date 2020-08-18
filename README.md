@@ -61,9 +61,29 @@ The date picker acts both as a date filter for the table and as time chooser for
 
 ## The table
 
-The table displays the information of all the types of tracking items for the child. 
-![One goal](/images/OneGoalMet.png)
+### Item creation
+
+#### Date time picker
+
+As mentioned before, the date time picker acts both as a date/time chooser for the item being created as well as a filter for the table. This is so that the user has the flexibility to add items on passed dates in case some information was missing. And also if you switch the day, you'll see the information displayed on the table changes to the one for that day.
+
+![Date Time](/images/DateTime.png)
+
+#### Item creation form
+
+The item creation form is pretty straight forward, user selects the type of event that was done for the baby and this gets recorded on the DB.
+![Create Item](/images/CreateItem.png)
+
+#### The table.
+The table displays the information of all the types of tracking items for the child. At the table itself you can modify value for amounts, duration and comments, once a value in the text field changes you will see the check mark in case you want to commit the changes to the DB.
 ![Edit visible](/images/EditVisible.png)
+
+Once you start filling the table, you can see that if you go above the thresholds that were set as goals for the child, messages will start appearing in the Goals information box, letting the user know that the goals for the day have been met:
+![One goal](/images/OneGoalMet.png)
+
+And this is an example of when all the goals have been met :
+
 ![All goals](/images/AllGoalsMet.png)
 
+This is all the functionality that this app has, we have one tracker notebook at home to check how much our baby has been fed so that's where the idea to make something like this was born.
 
