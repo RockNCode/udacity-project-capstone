@@ -13,6 +13,40 @@ This application is based ont he baby tracking notebooks that are commonly sold 
 # Disclaimer.
 I didn't have time (nor previous skills) to polish the frontend but the application is functional. I had to learn some react on the fly to finish it.
 
+# Setup 
+
+## Backend
+After cloning the progect
+cd backend
+npm i 
+
+serverless plugin install --name serverless-webpack
+
+serverless plugin install --name serverless-iam-roles-per-function
+
+serverless plugin install --name serverless-reqvalidator-plugin
+
+serverless plugin install --name serverless-aws-documentation
+
+serverless plugin install --name  serverless-dynamodb-local
+
+serverless plugin install --name serverless-offline
+
+serverless plugin install --name serverless-s3-local
+
+serverless deploy -v
+
+## Client
+
+cd ../client/
+
+npm i
+
+### config.ts
+Set the apiId to the right value (obtained in the serverless log) and run:
+
+npm run start
+
 # Tracker items.
 
 The application will store the planned schedule and by date table, will compare planned vs actual and give totals per day:
@@ -38,7 +72,7 @@ The tracker table
 * `amount` - Amount in ML of formula or breastmilk,
 * `comments` (string) (optional) - any comments
 
-# Setup
+# Application usage
 
 The first screen that will be shown after loging in is the following one : 
 
