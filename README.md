@@ -38,4 +38,15 @@ The tracker table
 * `amount` - Amount in ML of formula or breastmilk,
 * `comments` (string) (optional) - any comments
 
+# Setup
 
+The first screen that will be shown after loging in is the following one : 
+
+![First screen](/images/FirstScreen.png)
+
+At this point we can start creating Sleep, Feed, Medication and Nap type items to start tracking the baby. But it is better to first add a profile information so that the user can track if the goals for the day have been met.
+
+# Profile Screen
+The date chooser functions as a date filter for the table, as in the table will show only the data for the date in the picker, and also to choose a time
+
+#
