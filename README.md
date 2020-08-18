@@ -52,7 +52,7 @@ At this point we can start creating Sleep, Feed, Medication and Nap type items t
 
 At the profile screen (different DB table), the user can set its goals for his/her baby, like pee or poop diaper changes, feedings,etc, so in case for example the baby didn't had a poop diaper change for the day the user can notice and go back to check how many days the baby hasn't pooped and maybe tell this information to a pediatrician. 
 
-Note: There is a frontend issue, when the user uploads an image for the first time, the image won't refresh immediately so you'd need to navigate away and come back to see it, but if user updates the image the refresh does happen. I didn't have enough time to debug this before the next billing cycle but the functions requiered for the course are working.
+Note: There is a frontend issue, when the user uploads an image for the first time, the image won't refresh immediately so you'd need to navigate away and come back to see it, but if user updates the image the refresh does happen. I didn't have enough time to debug this before the next billing cycle but the functions required for the course are working.
 
 
 
@@ -61,6 +61,7 @@ Note: There is a frontend issue, when the user uploads an image for the first ti
 ## Date/time picker
 
 The date picker acts both as a date filter for the table and as time chooser for the new item creation. You can add items on different dates and times by changing the values on the date filter and it will also display different information on the table as you change it.  
+![Date Time](/images/DateTime.png)
 
 ## The table
 
@@ -70,7 +71,6 @@ The date picker acts both as a date filter for the table and as time chooser for
 
 As mentioned before, the date time picker acts both as a date/time chooser for the item being created as well as a filter for the table. This is so that the user has the flexibility to add items on passed dates in case some information was missing. And also if you switch the day, you'll see the information displayed on the table changes to the one for that day.
 
-![Date Time](/images/DateTime.png)
 
 #### Item creation form
 
