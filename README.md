@@ -16,8 +16,11 @@ I didn't have time (nor previous skills) to polish the frontend but the applicat
 # Setup 
 
 ## Backend
-After cloning the progect
+
+After cloning the project
+
 cd backend
+
 npm i 
 
 serverless plugin install --name serverless-webpack
