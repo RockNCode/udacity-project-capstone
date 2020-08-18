@@ -359,7 +359,7 @@ export class Tracking extends React.PureComponent<TrackingProps, TrackingState> 
         {this.renderGoalsInfo()}
         {this.renderGoalsError()}
         {this.renderDatePicker()}
-        {this.renderFilter()}
+        {/* {this.renderFilter()} */}
         {this.renderTracking()}
         {this.renderCreateTrackingInput()}
       </div>

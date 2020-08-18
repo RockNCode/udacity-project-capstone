@@ -55,7 +55,7 @@ export class EditTracking extends React.PureComponent<
     //console.log("JSON FILE : " + event.target.files[0]);
     const files = event.target.files
     if (!files) return
-    console.log("File name is : " + files[0].name)
+
     this.setState({
       file: files[0]
     })
