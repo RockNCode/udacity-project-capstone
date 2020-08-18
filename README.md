@@ -58,22 +58,20 @@ Note: There is a frontend issue, when the user uploads an image for the first ti
 
 # Back to the main screen.
 
-## The table
+## Item creation
 
-### Item creation
-
-#### Date time picker
+### Date time picker
 
 As mentioned before, the date time picker acts both as a date/time chooser for the item being created as well as a filter for the table. This is so that the user has the flexibility to add items on passed dates in case some information was missing. And also if you switch the day, you'll see the information displayed on the table changes to the one for that day.
 ![Date Time](/images/DateTime.png)
 
 
-#### Item creation form
+### Item creation form
 
 The item creation form is pretty straight forward, user selects the type of event that was done for the baby and this gets recorded on the DB.
 ![Create Item](/images/CreateItem.png)
 
-#### The table.
+### The table.
 The table displays the information of all the types of tracking items for the child. At the table itself you can modify value for amounts, duration and comments, once a value in the text field changes you will see the check mark in case you want to commit the changes to the DB.
 ![Edit visible](/images/EditVisible.png)
 
