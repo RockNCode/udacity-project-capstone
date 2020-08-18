@@ -55,6 +55,12 @@ custom:
       - name:  ${self:provider.environment.PROJECT}RequestSchema
         contentType: application/json
         schema: ${file(models/tracking-request.json)}
+      - name:  ${self:provider.environment.PROJECT}RequestSchemaUpdate
+        contentType: application/json
+        schema: ${file(models/update-request.json)}
+      - name:  ${self:provider.environment.PROJECT}RequestSchemaUser
+        contentType: application/json
+        schema: ${file(models/user-request.json)}
 
 functions:
 
@@ -69,10 +75,7 @@ functions:
           path: trackingdate/{isoDate}
           cors: true
           auth: Auth
-          # request:
-          #   parameters:
-          #     paths:
-          #       isoDate: true
+
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-get-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -129,7 +132,7 @@ functions:
             summary: Update tracking
             description: Update Tracking
             requestModels:
-              'application/json': ${self:provider.environment.PROJECT}RequestSchema
+              'application/json': ${self:provider.environment.PROJECT}RequestSchemaUpdate
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-tracking-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -149,9 +152,8 @@ functions:
           documentation:
             summary: Update user
             description: Update user
-            # ToDo
-            # requestModels:
-            #   'application/json': ${self:provider.environment.PROJECT}RequestSchema
+            requestModels:
+               'application/json': ${self:provider.environment.PROJECT}RequestSchemaUser
     iamRoleStatementsName: ${self:provider.environment.PROJECT}-role-update-user-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
@@ -160,7 +162,7 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
 
 
-  DeleteTodo:
+  DeleteTracking:
     handler: src/lambda/http/deleteTracking.handler
     events:
       - http:
@@ -203,6 +205,7 @@ resources:
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: ApiGatewayRestApi
+
     RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
       Properties:
@@ -211,6 +214,7 @@ resources:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
         ValidateRequestParameters: false
+
     TrackerDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:

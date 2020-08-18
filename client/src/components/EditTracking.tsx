@@ -73,7 +73,7 @@ export class EditTracking extends React.PureComponent<
         console.log("Upload url is: " + uploadUrl)
         this.setUploadState(UploadState.UploadingFile)
         await uploadFile(uploadUrl, this.state.file)
-        
+
       }
       const profileItem : any = {
         targetMilk: this.state.targetMilk,
@@ -88,6 +88,7 @@ export class EditTracking extends React.PureComponent<
       // Hack to force image reload no caching
       let mDate : Date = new Date();
       this.setState({imgSrc: "https://images-babytrack-dev.s3.amazonaws.com/" +this.state.userId + "?dummy=" + mDate.toISOString() })
+      alert("Profile updated successfully.")
 
     } catch (e) {
       alert('Error updating profile: ' + e.message)

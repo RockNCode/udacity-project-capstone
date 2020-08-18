@@ -21,11 +21,11 @@
         "type": "number"
       },
       "comments": {
-        "type": "string"
+        "type": ["string","null"]
       }
     },
     "required": [
-      "date","type"
+      "date"
     ],
     "additionalProperties": false
 }

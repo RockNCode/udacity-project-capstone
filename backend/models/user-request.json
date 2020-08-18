@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "user",
+    "type": "object",
+    "properties": {
+      "targetMilk": {
+        "type": ["number","null"]
+      },
+      "targetSleep":{
+        "type": ["number","null"]
+      },
+      "targetPoop": {
+        "type": ["number","null"]
+      },
+      "targetPee":{
+        "type": ["number","null"]
+      },
+      "name":{
+        "type": ["number","null"]
+      },
+      "fileUrl":{
+        "type": ["number","null"]
+      },
+      "age":{
+        "type": ["number","null"]
+      }
+    },
+    "required": [
+      "name","targetMilk","targetSleep","targetPoop","targetPee","fileUrl","age"
+    ],
+    "additionalProperties": false
+}

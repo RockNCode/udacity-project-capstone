@@ -50,6 +50,7 @@ export async function patchTracking(
   trackingId: string,
   updatedTracking: UpdateTrackingRequest
 ): Promise<void> {
+  console.log("Update tracking request is : " + JSON.stringify(updatedTracking))
   await Axios.patch(`${apiEndpoint}/tracking/${trackingId}`, JSON.stringify(updatedTracking), {
     headers: {
       'Content-Type': 'application/json',
