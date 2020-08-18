@@ -47,6 +47,18 @@ The first screen that will be shown after loging in is the following one :
 At this point we can start creating Sleep, Feed, Medication and Nap type items to start tracking the baby. But it is better to first add a profile information so that the user can track if the goals for the day have been met.
 
 # Profile Screen
-The date chooser functions as a date filter for the table, as in the table will show only the data for the date in the picker, and also to choose a time
 
-#
+At the profile screen (different DB table), the user can set its goals for his/her baby, like pee or poop diaper changes, feedings,etc, so that in case for example the baby didn't had a poop change for the day the user can notice and go back to check how many days the baby hasn't pooped and maybe tell this information to a pediatrician. 
+
+Note: There is a frontend issue, when the user uploads an image for the first time, the image won't refresh immediately so you'd need to navigate away and come back to see it, but if user updates the image the refresh does happen. I didn't have enough time to debug this before the next billing cycle but the functions requiered for the course are working.
+
+
+# Back to the main screen.
+
+## Date/time picker
+
+The date picker acts both as a date filter for the table and as time chooser for the new item creation. You can add items on different dates and times by changing the values on the date filter and it will also display different information on the table as you change it.  
+
+## The table
+
+
