@@ -48,7 +48,7 @@ At this point we can start creating Sleep, Feed, Medication and Nap type items t
 
 # Profile Screen
 
-At the profile screen (different DB table), the user can set its goals for his/her baby, like pee or poop diaper changes, feedings,etc, so that in case for example the baby didn't had a poop change for the day the user can notice and go back to check how many days the baby hasn't pooped and maybe tell this information to a pediatrician. 
+At the profile screen (different DB table), the user can set its goals for his/her baby, like pee or poop diaper changes, feedings,etc, so in case for example the baby didn't had a poop diaper change for the day the user can notice and go back to check how many days the baby hasn't pooped and maybe tell this information to a pediatrician. 
 
 Note: There is a frontend issue, when the user uploads an image for the first time, the image won't refresh immediately so you'd need to navigate away and come back to see it, but if user updates the image the refresh does happen. I didn't have enough time to debug this before the next billing cycle but the functions requiered for the course are working.
 
@@ -60,5 +60,10 @@ Note: There is a frontend issue, when the user uploads an image for the first ti
 The date picker acts both as a date filter for the table and as time chooser for the new item creation. You can add items on different dates and times by changing the values on the date filter and it will also display different information on the table as you change it.  
 
 ## The table
+
+The table displays the information of all the types of tracking items for the child. 
+![One goal](/images/OneGoalMet.png)
+![Edit visible](/images/EditVisible.png)
+![All goals](/images/AllGoalsMet.png)
 
 
